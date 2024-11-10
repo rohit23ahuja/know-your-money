@@ -18,3 +18,17 @@ output file format - generate accounting reports in xls format
 
 ### tech stack
 will be using spring batch, spring and java to develop this application
+
+### feature description - file loading in kym
+input source in kym app will be monthly account statements. 
+app should be able to recognise the underlying bank of the statement.
+app should then be able to recognise the format based on the identified bank
+app should then load the file in memory based on the format.
+
+### feature description - save transaction in kym
+loaded file contains account transaction and other information.
+this loaded information needs to be saved in database.
+information that needs to be saved - account information, transactions, balances
+
+### feature description - generate accounting report
+
