@@ -17,6 +17,15 @@ input file format - download monthly statements in csv,xls or pdf (in that order
 think it will be better to support pdf format first. because it is certain that every will be providing statement in atleast pdf format.
 output file format - generate accounting reports in xls format.
 
+#### file format as pdf
+Initially i decided that I will first provide support for PDF format. reason being every bank gives statement in PDF format. But have decided today that will provide support for xls format first.
+challenges with pdf file format is:-
+* pdf format primarily is for file printing
+* text extraction as of now looks hard for pdf vs excel documents.
+* text extraction as such is not hard for pdf but looks tricky if we have to do in a structured way.
+
+#### file format as xls
+
 ### tech stack
 will be using spring batch, spring and java to develop this application.
 
