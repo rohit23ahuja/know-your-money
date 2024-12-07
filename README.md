@@ -45,3 +45,4 @@ generated accounting reports will be uploaded on cloud storage.
 
 ### Reference links
 https://medium.com/@_samkitjain/developing-a-bank-statement-analyser-7470bffbe5e2
+someone had the same idea - https://github.com/alokkusingh/spring-batch-pdf-parser
