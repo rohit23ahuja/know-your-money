@@ -25,6 +25,7 @@ challenges with pdf file format is:-
 * text extraction as such is not hard for pdf but looks tricky if we have to do in a structured way.
 
 #### file format as xls
+* trying apache poi as the library
 
 ### tech stack
 will be using spring batch, spring and java to develop this application.
