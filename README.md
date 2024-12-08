@@ -41,6 +41,11 @@ loaded file contains account transaction and other information.
 this loaded information needs to be saved in database.
 information that needs to be saved - account information, transactions, balances.
 
+#### Transaction Loading in DB
+* define table definition in postgres.
+* define parsing logic in java.
+* save parsed data in db.
+
 ### feature description - generate accounting report
 loaded transactions need to be transformed and enriched.
 transformation needs to happen in a specific format and also generate unique transaction id.
