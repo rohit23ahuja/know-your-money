@@ -8,6 +8,7 @@ public class App {
         //PdfReader pdfReader = new PdfReader();
         //System.out.println(pdfReader.extractText("E:/AccountStatements/IciciBankOct24.pdf"));
         XlsReader xlsReader = new XlsReader();
-        System.out.println(xlsReader.extractText("E:/AccountStatements/HdfcBankOct24.xls"));
+        //System.out.println(xlsReader.extractText("E:/AccountStatements/HdfcBankOct24.xls"));
+        xlsReader.printTransactions("E:/AccountStatements/HdfcBankOct24.xls");
     }
 }
