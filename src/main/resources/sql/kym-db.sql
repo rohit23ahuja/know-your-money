@@ -8,3 +8,15 @@ CREATE TABLE TRANSACTIONS  (
 	DEPOSIT_AMOUNT NUMERIC(10,2),
 	CLOSING_BALANCE NUMERIC(10,2)
 ) ;
+
+CREATE TABLE STATEMENT_CELLS (
+	CELL VARCHAR(10) NOT NULL PRIMARY KEY,
+	TEXT VARCHAR(1000)
+);
+
+insert into statement_cells(cell, text) values('A1', 'Hdfc Bank');
+select * from statement_cells;
+truncate table statement_cells;
+
+select * from statement_cells where cell like '%23';
+select * from statement_cells where cell like 'A%';
