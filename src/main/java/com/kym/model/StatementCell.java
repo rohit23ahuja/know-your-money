@@ -1,3 +1,5 @@
 package com.kym.model;
 
-public record StatementCell(String cell, String text) {}
+public record StatementCell(long statementFileId, Integer rowIndex, Integer columnIndex, String cellRef,
+                            String rawValueText) {
+}

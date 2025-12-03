@@ -17,7 +17,7 @@ import java.util.List;
 
 public class StatementCellReader {
 
-    public List<StatementCell> readStatementCells(String filePath) {
+    public List<StatementCell> readStatementCells(long statementFileId, String filePath) {
         try (InputStream inputStream = new FileInputStream(filePath)) {
             HSSFWorkbook wb = new HSSFWorkbook(new POIFSFileSystem(inputStream));
             Sheet sheet1 = wb.getSheetAt(0);
@@ -26,7 +26,7 @@ public class StatementCellReader {
             for (Row row : sheet1) {
                 for (Cell cell : row) {
                     CellReference cellRef = new CellReference(row.getRowNum(), cell.getColumnIndex());
-                    statementCells.add(new StatementCell(cellRef.formatAsString(), formatter.formatCellValue(cell)));
+                    statementCells.add(new StatementCell(statementFileId, row.getRowNum(), cell.getColumnIndex(), cellRef.formatAsString(), formatter.formatCellValue(cell)));
                 }
             }
             return statementCells;

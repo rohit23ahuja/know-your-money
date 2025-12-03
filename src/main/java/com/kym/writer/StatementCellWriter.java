@@ -8,19 +8,25 @@ import java.sql.PreparedStatement;
 import java.sql.SQLException;
 import java.util.List;
 
+import static  com.kym.util.Constants.*;
 public class StatementCellWriter {
-    private static final String JDBC_URL = "jdbc:postgresql://localhost:5432/kymdb";
-    private static final String POSTGRES_USER = "postgres";
-    private static final String POSTGRES_PASSWORD = "password";
-    private static final String SQL_INSERT_STATEMENT_CELL = "insert into statement_cells(cell, text) values(?, ?)";
+
+    private static final String SQL_INSERT_STATEMENT_CELL = """
+    insert into 
+        statement_cell(statement_file_id, row_index, col_index, cell_ref, raw_value_text) 
+        values(?, ?, ?, ?, ?)
+    """;
 
     public int[] writeStatementCells(List<StatementCell> statementCells) {
         try (Connection connection = DriverManager.getConnection(
                 JDBC_URL, POSTGRES_USER, POSTGRES_PASSWORD);
             PreparedStatement preparedStatement = connection.prepareStatement(SQL_INSERT_STATEMENT_CELL)) {
             for (StatementCell cell: statementCells) {
-                preparedStatement.setString(1, cell.cell());
-                preparedStatement.setString(2, cell.text());
+                preparedStatement.setLong(1, cell.statementFileId());
+                preparedStatement.setInt(2, cell.rowIndex());
+                preparedStatement.setInt(3, cell.columnIndex());
+                preparedStatement.setString(4, cell.cellRef());
+                preparedStatement.setString(5, cell.rawValueText());
                 preparedStatement.addBatch();
             }
             return  preparedStatement.executeBatch();
