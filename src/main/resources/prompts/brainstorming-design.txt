@@ -1,3 +1,10 @@
+i am a java developer. i am building a tool for myself that will help reinforce my learnings in java, spring and spring
+batch framework as well as help organising my finances. Tool is supposed to read my monthly account statement. dump the
+data in database. identify the transaction data from the file. then gives me a summary of my monthly spends like how much
+i did spent on various categories like food, commute, health expenses etc.
+
+i have built the layer that takes my monthly account statement in xls format and dumps the data in database. this layer
+populates the below two tables :-
 CREATE TABLE statement_file
 (
     id                BIGSERIAL PRIMARY KEY,
@@ -6,7 +13,6 @@ CREATE TABLE statement_file
     original_filename VARCHAR(255) NOT NULL,
     uploaded_at       TIMESTAMPTZ  NOT NULL DEFAULT now()
 );
-
 CREATE TABLE statement_cell
 (
     id                BIGSERIAL PRIMARY KEY,
@@ -19,22 +25,4 @@ CREATE TABLE statement_cell
     created_at        TIMESTAMPTZ  NOT NULL DEFAULT now()
 );
 
-CREATE TABLE statement_structure (
-    id                BIGSERIAL PRIMARY KEY,
-    statement_file_id BIGINT NOT NULL
-        REFERENCES statement_file(id) ON DELETE CASCADE,
-
-    header_row_index  INTEGER NOT NULL,
-
-    date_col_index        INTEGER NOT NULL,
-    narration_col_index  INTEGER NOT NULL,
-    debit_col_index       INTEGER NULL,
-    credit_col_index      INTEGER NULL,
-    balance_col_index     INTEGER NULL,
-
-    data_start_row_index INTEGER NOT NULL,
-    data_end_row_index   INTEGER NULL,
-
-    detected_at        TIMESTAMPTZ NOT NULL DEFAULT now()
-);
-
+Design this system after this point.
