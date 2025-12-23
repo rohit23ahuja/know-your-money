@@ -37,34 +37,44 @@ public class StatementStructureDetector {
                                 "Deposit Amt.".equals(l.getValue().get(5).rawValueText()) &&
                                 "Closing Balance".equals(l.getValue().get(6).rawValueText())
                 )
-                .map(l-> new StatementStructure(statementFileId, l.getKey(),
-                        l.getValue().get(0).columnIndex(), l.getValue().get(1).columnIndex(),
-                        l.getValue().get(4).columnIndex(), l.getValue().get(5).columnIndex(), l.getValue().get(6).columnIndex(), 0, 0))
+                .map(l-> new StatementStructure(
+                        statementFileId,
+                        l.getKey(),
+                        l.getValue().get(0).columnIndex(),
+                        l.getValue().get(1).columnIndex(),
+                        l.getValue().get(4).columnIndex(),
+                        l.getValue().get(5).columnIndex(),
+                        l.getValue().get(6).columnIndex(),
+                        0,0))
                 .findFirst()
                 .orElseThrow(() -> new RuntimeException("Unable to detect header row."));
 
+        Integer headerRowIndex = statementStructure.headerRowIndex();
+        Integer dateColIndex = statementStructure.dateColIndex();
+
         Integer dataStartRowIndex =  statementCellsByRowIndex
                 .entrySet().stream()
-                .skip(statementStructure.headerRowIndex())
+                .filter(e -> e.getKey() > headerRowIndex)
                 .filter(l->
-                        isValidDate(l.getValue().get(0).rawValueText()))
+                        isValidDate(l.getValue().get(dateColIndex).rawValueText()))
                 .map(Map.Entry::getKey)
                 .findFirst()
                 .orElseThrow(() -> new RuntimeException("Start of transaction data not found"));
 
+
         Integer dataEndRowIndex =  statementCellsByRowIndex
                 .entrySet().stream()
-                .skip(dataStartRowIndex)
+                .filter(e -> e.getKey() > dataStartRowIndex)
                 .filter(l->
-                        !isValidDate(l.getValue().get(0).rawValueText()))
+                        !isValidDate(l.getValue().get(dateColIndex).rawValueText()))
                 .map(Map.Entry::getKey)
                 .findFirst()
                 .orElseThrow(() -> new RuntimeException("End of transaction data not found"));
         --dataEndRowIndex;
 
         statementStructure = new StatementStructure(statementStructure.statementFileId(),
-                statementStructure.headerRowIndex(),
-                statementStructure.dateColIndex(),
+                headerRowIndex,
+                dateColIndex,
                 statementStructure.narrationColIndex(),
                 statementStructure.debitColIndex(),
                 statementStructure.creditColIndex(),
