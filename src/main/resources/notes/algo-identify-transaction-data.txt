@@ -1,0 +1,6 @@
+1. load all data of a particular file id.
+2. map it into a list
+3. traverse list from 1st to last row index
+4. traverse sublist of each row, check if for col index = 0 raw_value_text matches "Date" and then col index = 1 matches
+"Narration" and so on.
+5. If all 7 match then this header row.

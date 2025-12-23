@@ -2,6 +2,8 @@ package com.kym;
 
 import com.kym.model.StatementCell;
 import com.kym.model.StatementFile;
+import com.kym.model.StatementStructure;
+import com.kym.processor.StatementStructureDetector;
 import com.kym.reader.StatementCellReader;
 import com.kym.writer.StatementCellWriter;
 import com.kym.writer.StatementFileWriter;
@@ -22,5 +24,9 @@ public class App {
         StatementCellWriter statementCellWriter = new StatementCellWriter();
         int[] updateCount = statementCellWriter.writeStatementCells(statementCells);
         System.out.println(Arrays.toString(updateCount));
+
+        StatementStructureDetector statementStructureDetector = new StatementStructureDetector();
+        StatementStructure statementStructure = statementStructureDetector.detect(statementFileId);
+        System.out.println(statementStructure);
     }
 }
