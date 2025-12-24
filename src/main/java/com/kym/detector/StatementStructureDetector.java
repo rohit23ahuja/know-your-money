@@ -17,24 +17,26 @@ public class StatementStructureDetector {
     public StatementStructure detect(long statementFileId, List<StatementCell> statementCells) {
         Map<Integer, List<StatementCell>> statementCellsByRowIndex = statementCells.stream().collect(Collectors.groupingBy(StatementCell::rowIndex));
         StatementStructure statementStructure = statementCellsByRowIndex.entrySet().stream()
-                .filter(l ->
-                        l.getValue().size() >= 7 &&
-                                "Date".equals(l.getValue().get(0).rawValueText()) &&
-                                "Narration".equals(l.getValue().get(1).rawValueText()) &&
-                                "Chq./Ref.No.".equals(l.getValue().get(2).rawValueText()) &&
-                                "Value Dt".equals(l.getValue().get(3).rawValueText()) &&
-                                "Withdrawal Amt.".equals(l.getValue().get(4).rawValueText()) &&
-                                "Deposit Amt.".equals(l.getValue().get(5).rawValueText()) &&
-                                "Closing Balance".equals(l.getValue().get(6).rawValueText())
+                .filter(l -> {
+                            Map<Integer, StatementCell> cellsByColumnIndex = l.getValue().stream().collect(Collectors.toMap(StatementCell::columnIndex, c -> c));
+                            return cellsByColumnIndex.size() >= 7 &&
+                                    "Date".equals(cellsByColumnIndex.get(0).rawValueText()) &&
+                                    "Narration".equals(cellsByColumnIndex.get(1).rawValueText()) &&
+                                    "Chq./Ref.No.".equals(cellsByColumnIndex.get(2).rawValueText()) &&
+                                    "Value Dt".equals(cellsByColumnIndex.get(3).rawValueText()) &&
+                                    "Withdrawal Amt.".equals(cellsByColumnIndex.get(4).rawValueText()) &&
+                                    "Deposit Amt.".equals(cellsByColumnIndex.get(5).rawValueText()) &&
+                                    "Closing Balance".equals(cellsByColumnIndex.get(6).rawValueText());
+                        }
                 )
                 .map(l -> new StatementStructure(
                         statementFileId,
                         l.getKey(),
-                        l.getValue().get(0).columnIndex(),
-                        l.getValue().get(1).columnIndex(),
-                        l.getValue().get(4).columnIndex(),
-                        l.getValue().get(5).columnIndex(),
-                        l.getValue().get(6).columnIndex(),
+                        0,
+                        1,
+                        4,
+                        5,
+                        6,
                         0, 0))
                 .findFirst()
                 .orElseThrow(() -> new RuntimeException("Unable to detect header row."));
@@ -45,22 +47,28 @@ public class StatementStructureDetector {
         Integer dataStartRowIndex = statementCellsByRowIndex
                 .entrySet().stream()
                 .filter(e -> e.getKey() > headerRowIndex)
-                .filter(l ->
-                        isValidDate(l.getValue().get(dateColIndex).rawValueText()))
+                .filter(l -> {
+                    Map<Integer, StatementCell> cellsByColumnIndex = l.getValue().stream().collect(Collectors.toMap(StatementCell::columnIndex, c -> c));
+                    StatementCell dateCell = cellsByColumnIndex.get(dateColIndex);
+                    return dateCell != null && isValidDate(dateCell.rawValueText());
+                })
                 .map(Map.Entry::getKey)
                 .findFirst()
                 .orElseThrow(() -> new RuntimeException("Start of transaction data not found"));
 
 
-        Integer dataEndRowIndex = statementCellsByRowIndex
+        Integer dataEndIndexFound = statementCellsByRowIndex
                 .entrySet().stream()
                 .filter(e -> e.getKey() > dataStartRowIndex)
-                .filter(l ->
-                        !isValidDate(l.getValue().get(dateColIndex).rawValueText()))
+                .filter(l -> {
+                    Map<Integer, StatementCell> cellsByColumnIndex = l.getValue().stream().collect(Collectors.toMap(StatementCell::columnIndex, e -> e));
+                    StatementCell dateCell = cellsByColumnIndex.get(dateColIndex);
+                    return dateCell != null && !isValidDate(dateCell.rawValueText());
+                })
                 .map(Map.Entry::getKey)
                 .findFirst()
                 .orElseThrow(() -> new RuntimeException("End of transaction data not found"));
-        --dataEndRowIndex;
+        Integer dataEndRowIndex = dataEndIndexFound-1;
 
         statementStructure = new StatementStructure(statementStructure.statementFileId(),
                 headerRowIndex,

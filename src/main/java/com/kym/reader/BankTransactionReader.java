@@ -41,26 +41,35 @@ public class BankTransactionReader {
 
         List<BankTransaction> bankTransactions = new ArrayList<>();
         for (Map.Entry<Integer, List<StatementCell>> statementCellEntry : statementCellsByRowIndex.entrySet()) {
+            Map<Integer, StatementCell> cellsByColumnIndex =
+                    statementCellEntry.getValue().stream()
+                            .collect(Collectors.toMap(StatementCell::columnIndex, c -> c));
+            StatementCell dateCell = cellsByColumnIndex.get(statementStructure.dateColIndex());
+            StatementCell narrationCell = cellsByColumnIndex.get(statementStructure.narrationColIndex());
+            StatementCell debitCell = cellsByColumnIndex.get(statementStructure.debitColIndex());
+            StatementCell creditCell = cellsByColumnIndex.get(statementStructure.creditColIndex());
+            StatementCell balanceCell = cellsByColumnIndex.get(statementStructure.balanceColIndex());
+
             LocalDate txnDate;
             try {
-                txnDate = LocalDate.parse(statementCellEntry.getValue().get(statementStructure.dateColIndex()).rawValueText(), STATEMENT_DATE_FORMAT);
+                txnDate = LocalDate.parse(dateCell.rawValueText(), STATEMENT_DATE_FORMAT);
             } catch (DateTimeParseException e) {
                 throw new RuntimeException(
-                        "Invalid date format: " + statementCellEntry.getValue().get(statementStructure.dateColIndex()).rawValueText() + ", expected dd/MM/uu", e
+                        "Invalid date format: " + dateCell.rawValueText() + ", expected dd/MM/uu", e
                 );
             }
             bankTransactions.add(
                     new BankTransaction(
                             statementFileId,
                             txnDate,
-                            statementCellEntry.getValue().get(statementStructure.narrationColIndex()).rawValueText(),
-                            statementCellEntry.getValue().get(statementStructure.debitColIndex()).rawValueText() != null &&
-                                    !("".equals(statementCellEntry.getValue().get(statementStructure.debitColIndex()).rawValueText())) ?
-                            new BigDecimal(statementCellEntry.getValue().get(statementStructure.debitColIndex()).rawValueText()) : null,
-                            statementCellEntry.getValue().get(statementStructure.creditColIndex()).rawValueText() != null &&
-                                    !("".equals(statementCellEntry.getValue().get(statementStructure.creditColIndex()).rawValueText())) ?
-                            new BigDecimal(statementCellEntry.getValue().get(statementStructure.creditColIndex()).rawValueText()) : null,
-                            new BigDecimal(statementCellEntry.getValue().get(statementStructure.balanceColIndex()).rawValueText()),
+                            narrationCell.rawValueText(),
+                            debitCell.rawValueText() != null &&
+                                    !(debitCell.rawValueText().isEmpty()) ?
+                            new BigDecimal(debitCell.rawValueText()) : null,
+                            creditCell.rawValueText() != null &&
+                                    !(creditCell.rawValueText().isEmpty()) ?
+                            new BigDecimal(creditCell.rawValueText()) : null,
+                            new BigDecimal(balanceCell.rawValueText()),
                             statementCellEntry.getKey()));
         }
         bankTransactionRepository.save(bankTransactions);
