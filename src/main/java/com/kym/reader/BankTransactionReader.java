@@ -40,40 +40,47 @@ public class BankTransactionReader {
         Map<Integer, List<StatementCell>> statementCellsByRowIndex = statementCells.stream().collect(Collectors.groupingBy(StatementCell::rowIndex));
 
         List<BankTransaction> bankTransactions = new ArrayList<>();
-        for (Map.Entry<Integer, List<StatementCell>> statementCellEntry : statementCellsByRowIndex.entrySet()) {
-            Map<Integer, StatementCell> cellsByColumnIndex =
-                    statementCellEntry.getValue().stream()
-                            .collect(Collectors.toMap(StatementCell::columnIndex, c -> c));
-            StatementCell dateCell = cellsByColumnIndex.get(statementStructure.dateColIndex());
-            StatementCell narrationCell = cellsByColumnIndex.get(statementStructure.narrationColIndex());
-            StatementCell debitCell = cellsByColumnIndex.get(statementStructure.debitColIndex());
-            StatementCell creditCell = cellsByColumnIndex.get(statementStructure.creditColIndex());
-            StatementCell balanceCell = cellsByColumnIndex.get(statementStructure.balanceColIndex());
+        statementCellsByRowIndex.entrySet()
+                .stream()
+                .sorted(Map.Entry.comparingByKey())
+                .forEach(statementCellEntry -> {
+                    Map<Integer, StatementCell> cellsByColumnIndex =
+                            statementCellEntry.getValue().stream()
+                                    .collect(Collectors.toMap(StatementCell::columnIndex, c -> c));
+                    StatementCell dateCell = cellsByColumnIndex.get(statementStructure.dateColIndex());
+                    StatementCell narrationCell = cellsByColumnIndex.get(statementStructure.narrationColIndex());
+                    StatementCell debitCell = cellsByColumnIndex.get(statementStructure.debitColIndex());
+                    StatementCell creditCell = cellsByColumnIndex.get(statementStructure.creditColIndex());
+                    StatementCell balanceCell = cellsByColumnIndex.get(statementStructure.balanceColIndex());
 
-            LocalDate txnDate;
-            try {
-                txnDate = LocalDate.parse(dateCell.rawValueText(), STATEMENT_DATE_FORMAT);
-            } catch (DateTimeParseException e) {
-                throw new RuntimeException(
-                        "Invalid date format: " + dateCell.rawValueText() + ", expected dd/MM/uu", e
-                );
-            }
-            bankTransactions.add(
-                    new BankTransaction(
-                            statementFileId,
-                            txnDate,
-                            narrationCell.rawValueText(),
-                            debitCell.rawValueText() != null &&
-                                    !(debitCell.rawValueText().isEmpty()) ?
-                            new BigDecimal(debitCell.rawValueText()) : null,
-                            creditCell.rawValueText() != null &&
-                                    !(creditCell.rawValueText().isEmpty()) ?
-                            new BigDecimal(creditCell.rawValueText()) : null,
-                            new BigDecimal(balanceCell.rawValueText()),
-                            statementCellEntry.getKey()));
-        }
+                    if(dateCell == null || narrationCell == null || balanceCell == null) {
+                        throw new RuntimeException("Mandatory column missing at row "+statementCellEntry.getKey());
+                    }
+
+                    LocalDate txnDate;
+                    try {
+                        txnDate = LocalDate.parse(dateCell.rawValueText(), STATEMENT_DATE_FORMAT);
+                    } catch (DateTimeParseException e) {
+                        throw new RuntimeException(
+                                "Invalid date format: " + dateCell.rawValueText() + ", expected dd/MM/uu", e
+                        );
+                    }
+                    bankTransactions.add(
+                            new BankTransaction(
+                                    statementFileId,
+                                    txnDate,
+                                    narrationCell.rawValueText(),
+                                    parseAmount(debitCell!=null?debitCell.rawValueText():null),
+                                    parseAmount(creditCell!=null?creditCell.rawValueText():null),
+                                    parseAmount(balanceCell.rawValueText()),
+                                    statementCellEntry.getKey()));
+                });
         bankTransactionRepository.save(bankTransactions);
     }
 
+    private static BigDecimal parseAmount(String text) {
+        if(text ==null || text.isBlank()) return null;
+        return new BigDecimal(text.replace(",", ""));
+    }
 
 }
