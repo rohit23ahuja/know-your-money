@@ -17,7 +17,14 @@ public class StatementCellWriter {
 
     private static final String SQL_SELECT_STATEMENT_CELL = """
             select row_index, col_index, cell_ref, raw_value_text from statement_cell where statement_file_id = ? 
-            order by row_index, col_index;
+            order by row_index, col_index
+            """;
+
+    private static final String SQL_SELECT_STATEMENT_CELL_BANK_TRANSACTIONS = """
+            select row_index, col_index, cell_ref, raw_value_text from statement_cell 
+            where row_index between ? and ? 
+            and statement_file_id = ? 
+            order by row_index, col_index
             """;
 
     public int[] writeStatementCells(List<StatementCell> statementCells) {
@@ -62,5 +69,32 @@ public class StatementCellWriter {
         } catch (SQLException e) {
             throw new RuntimeException("Failed to load statement cells for statement file id "+ statementFileId, e);
         }
+    }
+
+    public List<StatementCell> getStatementCells(Long statementFileId, Integer dataStartRowIndex, Integer dataEndRowIndex) {
+        List<StatementCell> statementCells = new ArrayList<>();
+        try (Connection connection = DriverManager.getConnection(
+                JDBC_URL, POSTGRES_USER, POSTGRES_PASSWORD);
+             PreparedStatement preparedStatement = connection.prepareStatement(SQL_SELECT_STATEMENT_CELL_BANK_TRANSACTIONS)) {
+            preparedStatement.setInt(1, dataStartRowIndex);
+            preparedStatement.setInt(2, dataEndRowIndex);
+            preparedStatement.setLong(3, statementFileId);
+
+            try(ResultSet resultSet = preparedStatement.executeQuery()) {
+                while(resultSet.next()) {
+                    StatementCell statementCell = new StatementCell(statementFileId,
+                            resultSet.getInt("row_index"),
+                            resultSet.getInt("col_index"),
+                            resultSet.getString("cell_ref"),
+                            resultSet.getString("raw_value_text")
+                    );
+                    statementCells.add(statementCell);
+                }
+            }
+            return statementCells;
+        } catch (SQLException e) {
+            throw new RuntimeException("Failed to get bank transactions for data row indexes : "+dataStartRowIndex+", "+dataEndRowIndex+".", e);
+        }
+
     }
 }
