@@ -1,22 +1,28 @@
 package com.kym.service;
 
-import com.kym.processor.StatementStructureDetector;
-import com.kym.repository.StatementCellRepository;
-import com.kym.repository.StatementStructureRepository;
+import com.kym.detector.StatementStructureDetector;
+import com.kym.model.StatementCell;
+import com.kym.model.StatementStructure;
+import com.kym.writer.StatementCellWriter;
+import com.kym.writer.StatementStructureWriter;
+
+import java.util.List;
 
 public class StatementStructureService {
 
-    private final StatementCellRepository statementCellRepository;
+    private final StatementCellWriter statementCellWriter;
     private final StatementStructureDetector statementStructureDetector;
-    private final StatementStructureRepository statementStructureRepository;
+    private final StatementStructureWriter statementStructureWriter;
 
     public StatementStructureService() {
-        statementStructureRepository = new StatementStructureRepository();
+        statementStructureWriter = new StatementStructureWriter();
         statementStructureDetector = new StatementStructureDetector();
-        statementCellRepository = new StatementCellRepository();
+        statementCellWriter = new StatementCellWriter();
     }
 
     public void detectStatementStructure(long statementFileId) {
-        
+        List<StatementCell> statementCells = statementCellWriter.getStatementCells(statementFileId);
+        StatementStructure statementStructure = statementStructureDetector.detect(statementFileId, statementCells);
+        statementStructureWriter.write(statementStructure);
     }
 }

@@ -1,4 +1,4 @@
-package com.kym.processor;
+package com.kym.detector;
 
 import com.kym.model.StatementCell;
 import com.kym.model.StatementStructure;
@@ -14,8 +14,7 @@ import java.util.stream.Collectors;
 public class StatementStructureDetector {
 
 
-    public StatementStructure detect(long statementFileId) {
-        List<StatementCell> statementCells = getStatementCells(statementFileId);
+    public StatementStructure detect(long statementFileId, List<StatementCell> statementCells) {
         Map<Integer, List<StatementCell>> statementCellsByRowIndex = statementCells.stream().collect(Collectors.groupingBy(StatementCell::rowIndex));
         StatementStructure statementStructure = statementCellsByRowIndex.entrySet().stream()
                 .filter(l ->
