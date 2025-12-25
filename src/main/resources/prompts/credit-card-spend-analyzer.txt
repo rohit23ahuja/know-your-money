@@ -1,0 +1,7 @@
+i want to change my direction here. so far with your help i have used my account statement to build this system, where i
+can categorize and analyze my debits as well as credits. i use credit card as well and rather than using my account statement
+I instead want to consume my credit card statement via this tool that we are building. same stack - lets stick to java only for now.
+This is helping me to learn. we will move to spring or spring batch later. Attached is my credit card statement. What i expect from
+this system it should categorize my spends based on configurable rules. Can we use the same low level design - load the statement in database,
+identify the statement structure, insert transactions based on identified structure and then categorize spends. Can we use the same tables?
+What else can be reused? Attached is my credit card statement.
