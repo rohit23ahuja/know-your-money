@@ -20,7 +20,7 @@ public class StatementLoadService {
         this.statementCellWriter = new StatementCellWriter();
     }
 
-    public long loadStatement(String bankCode, String accountNumber, String originalFileName) {
+    public long loadStatement(String accountName, String accountNumber, String statementType, String bankCode, String originalFileName) {
         StatementFile statementFile = new StatementFile(bankCode, accountNumber, originalFileName);
         long statementFileId = statementFileWriter.writeStatementFile(statementFile);
         List<StatementCell> statementCells = statementCellReader.readStatementCells(statementFileId, originalFileName);

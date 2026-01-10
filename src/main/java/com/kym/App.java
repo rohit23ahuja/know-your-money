@@ -8,7 +8,7 @@ public class App {
     public static void main(String[] args) {
 
         StatementLoadService statementLoadService = new StatementLoadService();
-        long statementFileId = statementLoadService.loadStatement(args[0], args[1], args[2]);
+        long statementFileId = statementLoadService.loadStatement(args[0], args[1], args[2], args[3], args[4]);
 
         StatementStructureService statementStructureService = new StatementStructureService();
         statementStructureService.detectStatementStructure(statementFileId);
