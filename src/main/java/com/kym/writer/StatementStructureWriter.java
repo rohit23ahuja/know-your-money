@@ -24,6 +24,12 @@ public class StatementStructureWriter {
                     returning id
                     """;
 
+    private final long statementFileId;
+
+    public StatementStructureWriter(long statementFileId) {
+        this.statementFileId = statementFileId;
+    }
+
     public StatementStructure getStatementStructure(long statementFileId) {
         try (Connection connection = DriverManager.getConnection(
                 JDBC_URL, POSTGRES_USER, POSTGRES_PASSWORD);

@@ -10,8 +10,8 @@ public class App {
         StatementLoadService statementLoadService = new StatementLoadService();
         long statementFileId = statementLoadService.loadStatement(args[0], args[1], args[2], args[3], args[4]);
 
-        StatementStructureService statementStructureService = new StatementStructureService();
-        statementStructureService.detectStatementStructure(statementFileId);
+        StatementStructureService statementStructureService = new StatementStructureService(statementFileId);
+        statementStructureService.detectStatementStructure();
 
         BankTransactionReader bankTransactionReader = new BankTransactionReader();
         bankTransactionReader.readTransactions(statementFileId);

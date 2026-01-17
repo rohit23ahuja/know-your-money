@@ -1,0 +1,17 @@
+Hdfc Account Statement
+
+expense-account
+3303
+account-statement
+hdfc
+E:/AccountStatements/HdfcBankOct24.xls
+
+
+=============================
+Hdfc Infinia Credit Card Statement
+
+rohit-infinia
+7193
+credit-card-statement
+hdfc
+E:/AccountStatements/Dec2025_Billedstatements_7193_24-12-25_21-39.xls

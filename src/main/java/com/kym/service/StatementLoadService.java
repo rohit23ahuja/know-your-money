@@ -21,7 +21,7 @@ public class StatementLoadService {
     }
 
     public long loadStatement(String accountName, String accountNumber, String statementType, String bankCode, String originalFileName) {
-        StatementFile statementFile = new StatementFile(bankCode, accountNumber, originalFileName);
+        StatementFile statementFile = new StatementFile(accountName, accountNumber, statementType, bankCode, originalFileName);
         long statementFileId = statementFileWriter.writeStatementFile(statementFile);
         List<StatementCell> statementCells = statementCellReader.readStatementCells(statementFileId, originalFileName);
         int[] updateCount = statementCellWriter.writeStatementCells(statementCells);

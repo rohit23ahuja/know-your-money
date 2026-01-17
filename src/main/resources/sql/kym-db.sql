@@ -1,8 +1,10 @@
 CREATE TABLE statement_file
 (
     id                BIGSERIAL PRIMARY KEY,
-    bank_code         VARCHAR(20)  NOT NULL,
+    account_name      VARCHAR(100)  NOT NULL,
     account_number    VARCHAR(64)  NOT NULL,
+    statement_type    VARCHAR(100)  NOT NULL,
+    bank_code         VARCHAR(20)  NOT NULL,
     original_filename VARCHAR(255) NOT NULL,
     uploaded_at       TIMESTAMPTZ  NOT NULL DEFAULT now()
 );

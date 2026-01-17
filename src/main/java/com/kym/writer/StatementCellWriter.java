@@ -26,6 +26,11 @@ public class StatementCellWriter {
             and statement_file_id = ? 
             order by row_index, col_index
             """;
+    private final long statementFileId;
+
+    public StatementCellWriter(long statementFileId) {
+        this.statementFileId = statementFileId;
+    }
 
     public int[] writeStatementCells(List<StatementCell> statementCells) {
         try (Connection connection = DriverManager.getConnection(
@@ -45,7 +50,7 @@ public class StatementCellWriter {
         }
     }
 
-    public List<StatementCell> getStatementCells(long statementFileId) {
+    public List<StatementCell> getStatementCells() {
         List<StatementCell> statementCells = new ArrayList<>();
         try (Connection connection = DriverManager.getConnection(
                 JDBC_URL, POSTGRES_USER, POSTGRES_PASSWORD);
