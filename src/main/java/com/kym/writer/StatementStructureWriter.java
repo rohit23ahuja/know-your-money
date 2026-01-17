@@ -1,6 +1,6 @@
 package com.kym.writer;
 
-import com.kym.model.StatementStructure;
+import com.kym.model.AccountStatementStructure;
 
 import java.sql.*;
 
@@ -30,7 +30,7 @@ public class StatementStructureWriter {
         this.statementFileId = statementFileId;
     }
 
-    public StatementStructure getStatementStructure(long statementFileId) {
+    public AccountStatementStructure getStatementStructure(long statementFileId) {
         try (Connection connection = DriverManager.getConnection(
                 JDBC_URL, POSTGRES_USER, POSTGRES_PASSWORD);
              PreparedStatement preparedStatement = connection.prepareStatement(SQL_SELECT_STATEMENT_STRUCTURE)) {
@@ -39,7 +39,7 @@ public class StatementStructureWriter {
                 if (!resultSet.next()) {
                     throw new RuntimeException("No statement_structure found for statement_file_id=" + statementFileId);
                 }
-                StatementStructure statementStructure = new StatementStructure(
+                AccountStatementStructure accountStatementStructure = new AccountStatementStructure(
                         resultSet.getLong("statement_file_id"),
                         resultSet.getInt("header_row_index"),
                         resultSet.getInt("date_col_index"),
@@ -55,28 +55,28 @@ public class StatementStructureWriter {
                             "Multiple statement_structure rows found for statement_file_id=" + statementFileId
                     );
                 }
-                return statementStructure;
+                return accountStatementStructure;
             }
         } catch (SQLException e) {
             throw new RuntimeException("Failed to load statement cells for statement file id " + statementFileId, e);
         }
     }
 
-    public long write(StatementStructure statementStructure) {
+    public long write(AccountStatementStructure accountStatementStructure) {
         long statementStructureId = 0l;
         try (Connection connection = DriverManager.getConnection(
                 JDBC_URL, POSTGRES_USER, POSTGRES_PASSWORD);
              PreparedStatement preparedStatement = connection.prepareStatement(SQL_INSERT_STATEMENT_STRUCTURE)) {
 
-            preparedStatement.setLong(1, statementStructure.statementFileId());
-            preparedStatement.setInt(2, statementStructure.headerRowIndex());
-            preparedStatement.setInt(3, statementStructure.dateColIndex());
-            preparedStatement.setInt(4, statementStructure.narrationColIndex());
-            preparedStatement.setInt(5, statementStructure.debitColIndex());
-            preparedStatement.setInt(6, statementStructure.creditColIndex());
-            preparedStatement.setInt(7, statementStructure.balanceColIndex());
-            preparedStatement.setInt(8, statementStructure.dataStartRowIndex());
-            preparedStatement.setInt(9, statementStructure.dataEndRowIndex());
+            preparedStatement.setLong(1, accountStatementStructure.statementFileId());
+            preparedStatement.setInt(2, accountStatementStructure.headerRowIndex());
+            preparedStatement.setInt(3, accountStatementStructure.dateColIndex());
+            preparedStatement.setInt(4, accountStatementStructure.narrationColIndex());
+            preparedStatement.setInt(5, accountStatementStructure.debitColIndex());
+            preparedStatement.setInt(6, accountStatementStructure.creditColIndex());
+            preparedStatement.setInt(7, accountStatementStructure.balanceColIndex());
+            preparedStatement.setInt(8, accountStatementStructure.dataStartRowIndex());
+            preparedStatement.setInt(9, accountStatementStructure.dataEndRowIndex());
 
             try (ResultSet resultSet = preparedStatement.executeQuery()) {
                 if (resultSet.next()) {

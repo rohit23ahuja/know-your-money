@@ -1,9 +1,10 @@
 package com.kym.service;
 
 import com.kym.detector.AccountStatementStructureDetector;
+import com.kym.detector.CreditCardStatementStructureDetector;
 import com.kym.model.StatementCell;
 import com.kym.model.StatementFile;
-import com.kym.model.StatementStructure;
+import com.kym.model.AccountStatementStructure;
 import com.kym.writer.StatementCellWriter;
 import com.kym.writer.StatementFileWriter;
 import com.kym.writer.StatementStructureWriter;
@@ -14,14 +15,12 @@ public class StatementStructureService {
 
     private final long statementFileId;
     private final StatementCellWriter statementCellWriter;
-    private final AccountStatementStructureDetector accountStatementStructureDetector;
     private final StatementStructureWriter statementStructureWriter;
     private final StatementFileWriter statementFileWriter;
 
     public StatementStructureService(long statementFileId) {
         this.statementFileId = statementFileId;
         statementStructureWriter = new StatementStructureWriter(statementFileId);
-        accountStatementStructureDetector = new AccountStatementStructureDetector(statementFileId);
         statementCellWriter = new StatementCellWriter(statementFileId);
         statementFileWriter = new StatementFileWriter();
     }
@@ -30,11 +29,16 @@ public class StatementStructureService {
         List<StatementCell> statementCells = statementCellWriter.getStatementCells();
         StatementFile statementFile = statementFileWriter.getStatementFile(statementFileId);
         if("credit-card-statement".equals(statementFile.statementType())) {
-
+            CreditCardStatementStructureDetector creditCardStatementStructureDetector = new CreditCardStatementStructureDetector(statementFileId);
+            creditCardStatementStructureDetector.detect(statementCells);
+            //TODO
         } else {
-            StatementStructure statementStructure = accountStatementStructureDetector.detect(statementCells);
+            AccountStatementStructureDetector accountStatementStructureDetector = new AccountStatementStructureDetector(statementFileId);
+            AccountStatementStructure accountStatementStructure = accountStatementStructureDetector.detect(statementCells);
+            statementStructureWriter.write(accountStatementStructure);
         }
 
-        statementStructureWriter.write(statementStructure);
+
+
     }
 }

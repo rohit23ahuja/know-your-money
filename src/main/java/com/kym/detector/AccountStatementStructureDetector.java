@@ -1,7 +1,7 @@
 package com.kym.detector;
 
 import com.kym.model.StatementCell;
-import com.kym.model.StatementStructure;
+import com.kym.model.AccountStatementStructure;
 
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
@@ -11,7 +11,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 
-public class AccountStatementStructureDetector implements StatementStructureDetector {
+public class AccountStatementStructureDetector {
 
     private final long statementFileId;
 
@@ -19,10 +19,9 @@ public class AccountStatementStructureDetector implements StatementStructureDete
         this.statementFileId = statementFileId;
     }
 
-    @Override
-    public StatementStructure detect(List<StatementCell> statementCells) {
+    public AccountStatementStructure detect(List<StatementCell> statementCells) {
         Map<Integer, List<StatementCell>> statementCellsByRowIndex = statementCells.stream().collect(Collectors.groupingBy(StatementCell::rowIndex));
-        StatementStructure statementStructure = statementCellsByRowIndex.entrySet().stream()
+        AccountStatementStructure accountStatementStructure = statementCellsByRowIndex.entrySet().stream()
                 .filter(l -> {
                             Map<Integer, StatementCell> cellsByColumnIndex = l.getValue().stream().collect(Collectors.toMap(StatementCell::columnIndex, c -> c));
                             return cellsByColumnIndex.size() >= 7 &&
@@ -35,7 +34,7 @@ public class AccountStatementStructureDetector implements StatementStructureDete
                                     "Closing Balance".equals(cellsByColumnIndex.get(6).rawValueText());
                         }
                 )
-                .map(l -> new StatementStructure(
+                .map(l -> new AccountStatementStructure(
                         statementFileId,
                         l.getKey(),
                         0,
@@ -47,8 +46,8 @@ public class AccountStatementStructureDetector implements StatementStructureDete
                 .findFirst()
                 .orElseThrow(() -> new RuntimeException("Unable to detect header row."));
 
-        Integer headerRowIndex = statementStructure.headerRowIndex();
-        Integer dateColIndex = statementStructure.dateColIndex();
+        Integer headerRowIndex = accountStatementStructure.headerRowIndex();
+        Integer dateColIndex = accountStatementStructure.dateColIndex();
 
         Integer dataStartRowIndex = statementCellsByRowIndex
                 .entrySet().stream()
@@ -76,17 +75,17 @@ public class AccountStatementStructureDetector implements StatementStructureDete
                 .orElseThrow(() -> new RuntimeException("End of transaction data not found"));
         Integer dataEndRowIndex = dataEndIndexFound-1;
 
-        statementStructure = new StatementStructure(statementStructure.statementFileId(),
+        accountStatementStructure = new AccountStatementStructure(accountStatementStructure.statementFileId(),
                 headerRowIndex,
                 dateColIndex,
-                statementStructure.narrationColIndex(),
-                statementStructure.debitColIndex(),
-                statementStructure.creditColIndex(),
-                statementStructure.balanceColIndex(),
+                accountStatementStructure.narrationColIndex(),
+                accountStatementStructure.debitColIndex(),
+                accountStatementStructure.creditColIndex(),
+                accountStatementStructure.balanceColIndex(),
                 dataStartRowIndex,
                 dataEndRowIndex);
 
-        return statementStructure;
+        return accountStatementStructure;
     }
 
 

@@ -2,7 +2,7 @@ package com.kym.reader;
 
 import com.kym.model.BankTransaction;
 import com.kym.model.StatementCell;
-import com.kym.model.StatementStructure;
+import com.kym.model.AccountStatementStructure;
 import com.kym.repository.BankTransactionRepository;
 import com.kym.writer.StatementCellWriter;
 import com.kym.writer.StatementStructureWriter;
@@ -34,9 +34,9 @@ public class BankTransactionReader {
 
 
     public void readTransactions(long statementFileId) {
-        StatementStructure statementStructure = statementStructureWriter.getStatementStructure(statementFileId);
+        AccountStatementStructure accountStatementStructure = statementStructureWriter.getStatementStructure(statementFileId);
         List<StatementCell> statementCells = statementCellWriter.getStatementCells(statementFileId,
-                statementStructure.dataStartRowIndex(), statementStructure.dataEndRowIndex());
+                accountStatementStructure.dataStartRowIndex(), accountStatementStructure.dataEndRowIndex());
         Map<Integer, List<StatementCell>> statementCellsByRowIndex = statementCells.stream().collect(Collectors.groupingBy(StatementCell::rowIndex));
 
         List<BankTransaction> bankTransactions = new ArrayList<>();
@@ -47,11 +47,11 @@ public class BankTransactionReader {
                     Map<Integer, StatementCell> cellsByColumnIndex =
                             statementCellEntry.getValue().stream()
                                     .collect(Collectors.toMap(StatementCell::columnIndex, c -> c));
-                    StatementCell dateCell = cellsByColumnIndex.get(statementStructure.dateColIndex());
-                    StatementCell narrationCell = cellsByColumnIndex.get(statementStructure.narrationColIndex());
-                    StatementCell debitCell = cellsByColumnIndex.get(statementStructure.debitColIndex());
-                    StatementCell creditCell = cellsByColumnIndex.get(statementStructure.creditColIndex());
-                    StatementCell balanceCell = cellsByColumnIndex.get(statementStructure.balanceColIndex());
+                    StatementCell dateCell = cellsByColumnIndex.get(accountStatementStructure.dateColIndex());
+                    StatementCell narrationCell = cellsByColumnIndex.get(accountStatementStructure.narrationColIndex());
+                    StatementCell debitCell = cellsByColumnIndex.get(accountStatementStructure.debitColIndex());
+                    StatementCell creditCell = cellsByColumnIndex.get(accountStatementStructure.creditColIndex());
+                    StatementCell balanceCell = cellsByColumnIndex.get(accountStatementStructure.balanceColIndex());
 
                     if(dateCell == null || narrationCell == null || balanceCell == null) {
                         throw new RuntimeException("Mandatory column missing at row "+statementCellEntry.getKey());
