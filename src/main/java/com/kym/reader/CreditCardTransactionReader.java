@@ -27,7 +27,7 @@ public class CreditCardTransactionReader {
         this.statementFileId = statementFileId;
         this.statementCellWriter = new StatementCellWriter(statementFileId);
         this.creditCardStatementStructureWriter = new CreditCardStatementStructureWriter(statementFileId);
-        this.creditCardTransactionRepository = new CreditCardTransactionRepository();
+        this.creditCardTransactionRepository = new CreditCardTransactionRepository(statementFileId);
     }
 
     private static BigDecimal parseAmount(String text) {
@@ -78,7 +78,8 @@ public class CreditCardTransactionReader {
                                                     rewardsCell.rawValueText().replace(" ", "")) : 0,
                                     amtCell != null ? parseAmount(amtCell.rawValueText()) : null,
                                     debitCreditCell.rawValueText(),
-                                    statementCellEntry.getKey()));
+                                    statementCellEntry.getKey(),
+                                    0L));
                 });
         creditCardTransactionRepository.save(creditCardTransactions);
 

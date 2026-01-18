@@ -2,6 +2,7 @@ package com.kym;
 
 import com.kym.service.StatementLoadService;
 import com.kym.service.StatementStructureService;
+import com.kym.service.TransactionCategorizationService;
 import com.kym.service.TransactionService;
 
 public class App {
@@ -15,6 +16,9 @@ public class App {
 
         TransactionService transactionService = new TransactionService(statementFileId);
         transactionService.readTransactions();
+
+        TransactionCategorizationService transactionCategorizationService = new TransactionCategorizationService(statementFileId);
+        transactionCategorizationService.categorize();
 
     }
 }
