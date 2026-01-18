@@ -1,8 +1,8 @@
 package com.kym;
 
-import com.kym.reader.BankTransactionReader;
 import com.kym.service.StatementLoadService;
 import com.kym.service.StatementStructureService;
+import com.kym.service.TransactionService;
 
 public class App {
     public static void main(String[] args) {
@@ -13,7 +13,8 @@ public class App {
         StatementStructureService statementStructureService = new StatementStructureService(statementFileId);
         statementStructureService.detectStatementStructure();
 
-        BankTransactionReader bankTransactionReader = new BankTransactionReader(statementFileId);
-        bankTransactionReader.readTransactions();
+        TransactionService transactionService = new TransactionService(statementFileId);
+        transactionService.readTransactions();
+
     }
 }

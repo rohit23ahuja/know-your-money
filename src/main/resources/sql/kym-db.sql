@@ -53,7 +53,7 @@ CREATE TABLE creditcard_statement_structure (
     detected_at TIMESTAMPTZ NOT NULL DEFAULT now()
 );
 
-CREATE TABLE bank_transaction (
+CREATE TABLE account_transaction (
     id                BIGSERIAL PRIMARY KEY,
     statement_file_id BIGINT NOT NULL
         REFERENCES statement_file(id) ON DELETE CASCADE,
@@ -64,4 +64,20 @@ CREATE TABLE bank_transaction (
     balance           NUMERIC(12,2) NULL,
     source_row_index  INTEGER NOT NULL,
     created_at        TIMESTAMPTZ NOT NULL DEFAULT now()
+);
+
+CREATE TABLE creditcard_transaction (
+    id BIGSERIAL PRIMARY KEY,
+    statement_file_id BIGINT NOT NULL
+        REFERENCES statement_file(id) ON DELETE CASCADE,
+    txn_type TEXT NOT NULL,
+    customer_name TEXT NOT NULL,
+    txn_date DATE NOT NULL,
+    txn_time TIME NOT NULL,
+    description TEXT NOT NULL,
+	rewards integer null,
+	amt NUMERIC(12,2) NULL,
+	debit_credit text null,
+    source_row_index INTEGER NOT NULL,
+    created_at TIMESTAMPTZ NOT NULL DEFAULT now()
 );

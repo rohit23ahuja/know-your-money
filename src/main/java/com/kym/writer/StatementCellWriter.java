@@ -76,7 +76,7 @@ public class StatementCellWriter {
         }
     }
 
-    public List<StatementCell> getStatementCells(Long statementFileId, Integer dataStartRowIndex, Integer dataEndRowIndex) {
+    public List<StatementCell> getStatementCells(Integer dataStartRowIndex, Integer dataEndRowIndex) {
         List<StatementCell> statementCells = new ArrayList<>();
         try (Connection connection = DriverManager.getConnection(
                 JDBC_URL, POSTGRES_USER, POSTGRES_PASSWORD);

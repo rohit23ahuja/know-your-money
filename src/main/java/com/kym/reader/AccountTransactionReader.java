@@ -1,9 +1,9 @@
 package com.kym.reader;
 
-import com.kym.model.BankTransaction;
+import com.kym.model.AccountTransaction;
 import com.kym.model.StatementCell;
 import com.kym.model.AccountStatementStructure;
-import com.kym.repository.BankTransactionRepository;
+import com.kym.repository.AccountTransactionRepository;
 import com.kym.writer.StatementCellWriter;
 import com.kym.writer.AccountStatementStructureWriter;
 
@@ -17,31 +17,32 @@ import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 
-public class BankTransactionReader {
+public class AccountTransactionReader {
     private static final DateTimeFormatter STATEMENT_DATE_FORMAT =
             DateTimeFormatter.ofPattern("dd/MM/uu")
                     .withResolverStyle(ResolverStyle.STRICT);
 
     private final StatementCellWriter statementCellWriter;
     private final AccountStatementStructureWriter accountStatementStructureWriter;
-    private final BankTransactionRepository bankTransactionRepository;
+    private final AccountTransactionRepository accountTransactionRepository;
     private final Long statementFileId;
 
-    public BankTransactionReader(long statementFileId) {
+    public AccountTransactionReader(long statementFileId) {
         this.statementFileId = statementFileId;
         statementCellWriter = new StatementCellWriter(statementFileId);
         accountStatementStructureWriter = new AccountStatementStructureWriter(statementFileId);
-        bankTransactionRepository = new BankTransactionRepository();
+        accountTransactionRepository = new AccountTransactionRepository();
     }
 
 
     public void readTransactions() {
         AccountStatementStructure accountStatementStructure = accountStatementStructureWriter.getStatementStructure();
-        List<StatementCell> statementCells = statementCellWriter.getStatementCells(statementFileId,
-                accountStatementStructure.dataStartRowIndex(), accountStatementStructure.dataEndRowIndex());
+        List<StatementCell> statementCells = statementCellWriter.getStatementCells(
+                accountStatementStructure.dataStartRowIndex(),
+                accountStatementStructure.dataEndRowIndex());
         Map<Integer, List<StatementCell>> statementCellsByRowIndex = statementCells.stream().collect(Collectors.groupingBy(StatementCell::rowIndex));
 
-        List<BankTransaction> bankTransactions = new ArrayList<>();
+        List<AccountTransaction> accountTransactions = new ArrayList<>();
         statementCellsByRowIndex.entrySet()
                 .stream()
                 .sorted(Map.Entry.comparingByKey())
@@ -67,8 +68,8 @@ public class BankTransactionReader {
                                 "Invalid date format: " + dateCell.rawValueText() + ", expected dd/MM/uu", e
                         );
                     }
-                    bankTransactions.add(
-                            new BankTransaction(
+                    accountTransactions.add(
+                            new AccountTransaction(
                                     statementFileId,
                                     txnDate,
                                     narrationCell.rawValueText(),
@@ -77,7 +78,7 @@ public class BankTransactionReader {
                                     parseAmount(balanceCell.rawValueText()),
                                     statementCellEntry.getKey()));
                 });
-        bankTransactionRepository.save(bankTransactions);
+        accountTransactionRepository.save(accountTransactions);
     }
 
     private static BigDecimal parseAmount(String text) {
