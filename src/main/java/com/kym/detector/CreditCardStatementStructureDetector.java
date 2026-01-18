@@ -1,6 +1,5 @@
 package com.kym.detector;
 
-import com.kym.model.AccountStatementStructure;
 import com.kym.model.CreditCardStatementStructure;
 import com.kym.model.StatementCell;
 
@@ -71,9 +70,18 @@ public class CreditCardStatementStructureDetector {
                 .map(Map.Entry::getKey)
                 .findFirst()
                 .orElseThrow(() -> new RuntimeException("End of transaction data not found"));
-        Integer dataEndRowIndex = dataEndIndexFound-1;
+        Integer dataEndRowIndex = dataEndIndexFound - 1;
 
-
-        return new CreditCardStatementStructure(creditCardStatementStructure.statementFileId(), headerRowIndex, transactionTypeColIndex, creditCardStatementStructure.customerNameColIndex(), creditCardStatementStructure.dateTimeColIndex(), creditCardStatementStructure.descriptionColIndex(), creditCardStatementStructure.rewardsColIndex(), creditCardStatementStructure.amtColIndex(), creditCardStatementStructure.debitCreditColIndex(), dataStartRowIndex, dataEndRowIndex);
+        return new CreditCardStatementStructure(
+                creditCardStatementStructure.statementFileId(),
+                headerRowIndex,
+                transactionTypeColIndex,
+                creditCardStatementStructure.customerNameColIndex(),
+                creditCardStatementStructure.dateTimeColIndex(),
+                creditCardStatementStructure.descriptionColIndex(),
+                creditCardStatementStructure.rewardsColIndex(),
+                creditCardStatementStructure.amtColIndex(),
+                creditCardStatementStructure.debitCreditColIndex(),
+                dataStartRowIndex, dataEndRowIndex);
     }
 }

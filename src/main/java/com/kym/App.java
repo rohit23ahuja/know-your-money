@@ -13,7 +13,7 @@ public class App {
         StatementStructureService statementStructureService = new StatementStructureService(statementFileId);
         statementStructureService.detectStatementStructure();
 
-        BankTransactionReader bankTransactionReader = new BankTransactionReader();
-        bankTransactionReader.readTransactions(statementFileId);
+        BankTransactionReader bankTransactionReader = new BankTransactionReader(statementFileId);
+        bankTransactionReader.readTransactions();
     }
 }

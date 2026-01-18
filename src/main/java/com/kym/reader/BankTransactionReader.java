@@ -5,7 +5,7 @@ import com.kym.model.StatementCell;
 import com.kym.model.AccountStatementStructure;
 import com.kym.repository.BankTransactionRepository;
 import com.kym.writer.StatementCellWriter;
-import com.kym.writer.StatementStructureWriter;
+import com.kym.writer.AccountStatementStructureWriter;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
@@ -23,18 +23,20 @@ public class BankTransactionReader {
                     .withResolverStyle(ResolverStyle.STRICT);
 
     private final StatementCellWriter statementCellWriter;
-    private final StatementStructureWriter statementStructureWriter;
+    private final AccountStatementStructureWriter accountStatementStructureWriter;
     private final BankTransactionRepository bankTransactionRepository;
+    private final Long statementFileId;
 
-    public BankTransactionReader() {
-        statementCellWriter = new StatementCellWriter();
-        statementStructureWriter = new StatementStructureWriter();
+    public BankTransactionReader(long statementFileId) {
+        this.statementFileId = statementFileId;
+        statementCellWriter = new StatementCellWriter(statementFileId);
+        accountStatementStructureWriter = new AccountStatementStructureWriter(statementFileId);
         bankTransactionRepository = new BankTransactionRepository();
     }
 
 
-    public void readTransactions(long statementFileId) {
-        AccountStatementStructure accountStatementStructure = statementStructureWriter.getStatementStructure(statementFileId);
+    public void readTransactions() {
+        AccountStatementStructure accountStatementStructure = accountStatementStructureWriter.getStatementStructure();
         List<StatementCell> statementCells = statementCellWriter.getStatementCells(statementFileId,
                 accountStatementStructure.dataStartRowIndex(), accountStatementStructure.dataEndRowIndex());
         Map<Integer, List<StatementCell>> statementCellsByRowIndex = statementCells.stream().collect(Collectors.groupingBy(StatementCell::rowIndex));

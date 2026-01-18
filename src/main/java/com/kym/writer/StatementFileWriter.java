@@ -16,7 +16,7 @@ public class StatementFileWriter {
 
     private static final String SQL_GET_STATEMENT_FILE = """
             select account_name, account_number, statement_type, bank_code, original_filename 
-            from statement_file where id=39;
+            from statement_file where id=?;
             """;
 
     public long writeStatementFile(StatementFile statementFile) {

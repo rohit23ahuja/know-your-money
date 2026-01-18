@@ -21,7 +21,7 @@ CREATE TABLE statement_cell
     created_at        TIMESTAMPTZ  NOT NULL DEFAULT now()
 );
 
-CREATE TABLE statement_structure (
+CREATE TABLE account_statement_structure (
     id                BIGSERIAL PRIMARY KEY,
     statement_file_id BIGINT NOT NULL
         REFERENCES statement_file(id) ON DELETE CASCADE,
@@ -32,8 +32,25 @@ CREATE TABLE statement_structure (
     credit_col_index      INTEGER NULL,
     balance_col_index     INTEGER NULL,
     data_start_row_index INTEGER NOT NULL,
-    data_end_row_index   INTEGER NULL,
+    data_end_row_index   INTEGER NOT NULL,
     detected_at        TIMESTAMPTZ NOT NULL DEFAULT now()
+);
+
+CREATE TABLE creditcard_statement_structure (
+    id                BIGSERIAL PRIMARY KEY,
+    statement_file_id BIGINT NOT NULL
+        REFERENCES statement_file(id) ON DELETE CASCADE,
+    header_row_index  INTEGER NOT NULL,
+    transactiontype_col_index INTEGER NOT NULL,
+    customername_col_index INTEGER NOT NULL,
+    datetime_col_index INTEGER NOT NULL,
+    description_col_index INTEGER NOT NULL,
+    rewards_col_index INTEGER NULL,
+    amt_col_index INTEGER NOT NULL,
+    debitcredit_col_index INTEGER NULL,
+    data_start_row_index INTEGER NOT NULL,
+    data_end_row_index   INTEGER NOT NULL,
+    detected_at TIMESTAMPTZ NOT NULL DEFAULT now()
 );
 
 CREATE TABLE bank_transaction (
@@ -48,4 +65,3 @@ CREATE TABLE bank_transaction (
     source_row_index  INTEGER NOT NULL,
     created_at        TIMESTAMPTZ NOT NULL DEFAULT now()
 );
-

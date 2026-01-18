@@ -6,19 +6,19 @@ import java.sql.*;
 
 import static com.kym.util.Constants.*;
 
-public class StatementStructureWriter {
+public class AccountStatementStructureWriter {
 
-    private static final String SQL_SELECT_STATEMENT_STRUCTURE =
+    private static final String SQL_SELECT_ACCOUNT_STATEMENT_STRUCTURE =
             """
                     select 
                           statement_file_id, header_row_index, date_col_index, narration_col_index, debit_col_index, 
                           credit_col_index, balance_col_index, data_start_row_index, data_end_row_index 
-                    from statement_structure where statement_file_id = ?;
+                    from account_statement_structure where statement_file_id = ?;
                     """;
 
-    private static final String SQL_INSERT_STATEMENT_STRUCTURE =
+    private static final String SQL_INSERT_ACCOUNT_STATEMENT_STRUCTURE =
             """
-                    insert into statement_structure(statement_file_id, header_row_index, date_col_index, narration_col_index, 
+                    insert into account_statement_structure(statement_file_id, header_row_index, date_col_index, narration_col_index, 
                     debit_col_index, credit_col_index, balance_col_index, data_start_row_index, data_end_row_index) 
                     values(?,?,?,?,?,?,?,?,?)
                     returning id
@@ -26,14 +26,14 @@ public class StatementStructureWriter {
 
     private final long statementFileId;
 
-    public StatementStructureWriter(long statementFileId) {
+    public AccountStatementStructureWriter(long statementFileId) {
         this.statementFileId = statementFileId;
     }
 
-    public AccountStatementStructure getStatementStructure(long statementFileId) {
+    public AccountStatementStructure getStatementStructure() {
         try (Connection connection = DriverManager.getConnection(
                 JDBC_URL, POSTGRES_USER, POSTGRES_PASSWORD);
-             PreparedStatement preparedStatement = connection.prepareStatement(SQL_SELECT_STATEMENT_STRUCTURE)) {
+             PreparedStatement preparedStatement = connection.prepareStatement(SQL_SELECT_ACCOUNT_STATEMENT_STRUCTURE)) {
             preparedStatement.setLong(1, statementFileId);
             try (ResultSet resultSet = preparedStatement.executeQuery()) {
                 if (!resultSet.next()) {
@@ -66,7 +66,7 @@ public class StatementStructureWriter {
         long statementStructureId = 0l;
         try (Connection connection = DriverManager.getConnection(
                 JDBC_URL, POSTGRES_USER, POSTGRES_PASSWORD);
-             PreparedStatement preparedStatement = connection.prepareStatement(SQL_INSERT_STATEMENT_STRUCTURE)) {
+             PreparedStatement preparedStatement = connection.prepareStatement(SQL_INSERT_ACCOUNT_STATEMENT_STRUCTURE)) {
 
             preparedStatement.setLong(1, accountStatementStructure.statementFileId());
             preparedStatement.setInt(2, accountStatementStructure.headerRowIndex());

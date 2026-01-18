@@ -37,7 +37,7 @@ public class StatementCellWriter {
                 JDBC_URL, POSTGRES_USER, POSTGRES_PASSWORD);
             PreparedStatement preparedStatement = connection.prepareStatement(SQL_INSERT_STATEMENT_CELL)) {
             for (StatementCell cell: statementCells) {
-                preparedStatement.setLong(1, cell.statementFileId());
+                preparedStatement.setLong(1, statementFileId);
                 preparedStatement.setInt(2, cell.rowIndex());
                 preparedStatement.setInt(3, cell.columnIndex());
                 preparedStatement.setString(4, cell.cellRef());
