@@ -79,7 +79,7 @@ public class CreditCardTransactionReader {
                                     amtCell != null ? parseAmount(amtCell.rawValueText()) : null,
                                     debitCreditCell.rawValueText(),
                                     statementCellEntry.getKey(),
-                                    0L));
+                                    0L, null));
                 });
         creditCardTransactionRepository.save(creditCardTransactions);
 

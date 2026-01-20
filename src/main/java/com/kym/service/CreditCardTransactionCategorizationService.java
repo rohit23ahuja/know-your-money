@@ -2,7 +2,6 @@ package com.kym.service;
 
 import com.kym.model.CreditCardTransaction;
 import com.kym.model.CreditCardTransactionCategorization;
-import com.kym.repository.CreditCardTransactionCategorizationRepository;
 
 import java.math.BigDecimal;
 import java.util.ArrayList;
@@ -10,15 +9,9 @@ import java.util.List;
 
 public class CreditCardTransactionCategorizationService {
 
-    private final CreditCardTransactionCategorizationRepository creditCardTransactionCategorizationRepository;
-
-    public CreditCardTransactionCategorizationService() {
-        this.creditCardTransactionCategorizationRepository = new CreditCardTransactionCategorizationRepository();
-    }
-
-    public void categorize(List<CreditCardTransaction> creditCardTransactions) {
+    public List<CreditCardTransactionCategorization> categorize(List<CreditCardTransaction> creditCardTransactions) {
         List<CreditCardTransactionCategorization> creditCardTransactionCategorizations = new ArrayList<>();
-        creditCardTransactions.stream().forEach(creditCardTransaction -> {
+        for (CreditCardTransaction creditCardTransaction : creditCardTransactions) {
             StringBuilder transactionCategorization = new StringBuilder();
             String description = creditCardTransaction.description();
             if (description.contains("Instamart") ||
@@ -135,8 +128,7 @@ public class CreditCardTransactionCategorizationService {
                     creditCardTransaction.id(),
                     transactionCategorization.toString()
             ));
-        });
-
-        creditCardTransactionCategorizationRepository.save(creditCardTransactionCategorizations);
+        }
+        return creditCardTransactionCategorizations;
     }
 }

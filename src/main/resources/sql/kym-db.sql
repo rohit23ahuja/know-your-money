@@ -77,15 +77,7 @@ CREATE TABLE creditcard_transaction (
 	rewards integer null,
 	amt NUMERIC(12,2) NULL,
 	debit_credit text null,
+    transaction_categorization TEXT,
     source_row_index INTEGER NOT NULL,
     created_at TIMESTAMPTZ NOT NULL DEFAULT now()
-);
-
-create table creditcard_transaction_categorization (
-    id BIGSERIAL PRIMARY KEY,
-    statement_file_id BIGINT not null
-        REFERENCES statement_file(id) ON DELETE CASCADE,
-    transaction_id bigint not null
-            REFERENCES creditcard_transaction(id) ON DELETE CASCADE,
-    transaction_categorization TEXT NOT NULL
 );

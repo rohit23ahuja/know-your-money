@@ -1,6 +1,7 @@
 package com.kym.repository;
 
 import com.kym.model.CreditCardTransaction;
+import com.kym.model.CreditCardTransactionCategorization;
 
 import java.sql.*;
 import java.util.ArrayList;
@@ -21,6 +22,9 @@ public class CreditCardTransactionRepository {
             from creditcard_transaction where statement_file_id = ? order by id;
             """;
 
+    private static final String SQL_UPDATE_CREDIT_CARD_TRANSACTION = """
+            update creditcard_transaction set transaction_categorization = ? where statement_file_id = ? and id = ?;
+            """;
     private final long statementFileId;
 
     public CreditCardTransactionRepository(long statementFileId) {
@@ -68,7 +72,8 @@ public class CreditCardTransactionRepository {
                             resultSet.getBigDecimal("amt"),
                             resultSet.getString("debit_credit"),
                             resultSet.getInt("source_row_index"),
-                            resultSet.getLong("id")
+                            resultSet.getLong("id"),
+                            null
                     ));
                 }
             }
@@ -76,6 +81,20 @@ public class CreditCardTransactionRepository {
         } catch (SQLException e) {
             throw new RuntimeException("Exception occurred while fetching credit card transaction for statement file id " + statementFileId, e);
         }
+    }
 
+    public int[] update(List<CreditCardTransactionCategorization> creditCardTransactionCategorizations) {
+        try (Connection connection = DriverManager.getConnection(JDBC_URL, POSTGRES_USER, POSTGRES_PASSWORD);
+             PreparedStatement preparedStatement = connection.prepareStatement(SQL_UPDATE_CREDIT_CARD_TRANSACTION)) {
+            for (CreditCardTransactionCategorization creditCardTransactionCategorization : creditCardTransactionCategorizations) {
+                preparedStatement.setString(1, creditCardTransactionCategorization.transactionCategorization());
+                preparedStatement.setLong(2, creditCardTransactionCategorization.statementFileId());
+                preparedStatement.setLong(3, creditCardTransactionCategorization.transactionId());
+                preparedStatement.addBatch();
+            }
+            return preparedStatement.executeBatch();
+        } catch (SQLException e) {
+            throw new RuntimeException("Exception occurred while updating credit card transaction categorizations");
+        }
     }
 }

@@ -70,6 +70,9 @@ CREATE TABLE creditcard_transaction (
     created_at TIMESTAMPTZ NOT NULL DEFAULT now()
 );
 
-select statement_file_id, txn_type, customer_name, txn_date, txn_time, description, rewards, amt, debit_credit, source_row_index, id 
-from creditcard_transaction where statement_file_id = 1 order by id;
+select cct.statement_file_id, cct.txn_type, cct.customer_name, cct.txn_date, cct.txn_time, 
+cct.description, cctc.transaction_categorization, cct.amt, cct.debit_credit, cct.source_row_index, cct.id, cct.rewards 
+from creditcard_transaction cct join creditcard_transaction_categorization cctc 
+on cct.id = cctc.transaction_id order by id;
 
+select * from creditcard_transaction_categorization;

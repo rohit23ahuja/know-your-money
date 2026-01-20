@@ -1,6 +1,7 @@
 package com.kym.service;
 
 import com.kym.model.CreditCardTransaction;
+import com.kym.model.CreditCardTransactionCategorization;
 import com.kym.model.StatementFile;
 import com.kym.repository.CreditCardTransactionRepository;
 import com.kym.writer.StatementFileWriter;
@@ -24,9 +25,10 @@ public class TransactionCategorizationService {
         if ("credit-card-statement".equals(statementFile.statementType())) {
             List<CreditCardTransaction> creditCardTransactions = creditCardTransactionRepository.getCreditCardTransactions();
             CreditCardTransactionCategorizationService creditCardTransactionCategorizationService = new CreditCardTransactionCategorizationService();
-            creditCardTransactionCategorizationService.categorize(creditCardTransactions);
+            List<CreditCardTransactionCategorization> creditCardTransactionCategorizations = creditCardTransactionCategorizationService.categorize(creditCardTransactions);
+            creditCardTransactionRepository.update(creditCardTransactionCategorizations);
         } else {
-
+//TODO
         }
     }
 }
