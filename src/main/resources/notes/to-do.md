@@ -1,0 +1,15 @@
+- date format correct in db save and on ui
+- search on description and category column
+- sponsor column introduction
+- decide by default how and what data will be loaded
+- comments column introduction
+- format to define categorisation rules
+- format to define sponsorship rules
+- domestic transaction column as category
+- credit row in green
+- transaction date and time in one column
+- remove 'category:' for categorization column.
+- rohit and deepika transactions as separate accounts
+- reward points
+- add security
+- 
