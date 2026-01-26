@@ -12,13 +12,13 @@ import static com.kym.util.Constants.*;
 public class CreditCardTransactionRepository {
     private static final String SQL_INSERT_CREDIT_CARD_TRANSACTION = """
             insert into 
-            creditcard_transaction(statement_file_id, txn_type, customer_name, txn_date, txn_time, description, rewards, amt, debit_credit, source_row_index)
-            values (?, ?, ?, ?, ?, ?, ?, ?, ?, ?);
+            creditcard_transaction(statement_file_id, txn_type, customer_name, txn_datetime, description, rewards, amt, debit_credit, source_row_index)
+            values (?, ?, ?, ?, ?, ?, ?, ?, ?);
             """;
 
     private static final String SQL_SELECT_CREDIT_CARD_TRANSACATION = """
             select 
-            statement_file_id, txn_type, customer_name, txn_date, txn_time, description, rewards, amt, debit_credit, source_row_index, id 
+            statement_file_id, txn_type, customer_name, txn_datetime, description, rewards, amt, debit_credit, source_row_index, id 
             from creditcard_transaction where statement_file_id = ? order by id;
             """;
 
@@ -39,13 +39,12 @@ public class CreditCardTransactionRepository {
                 preparedStatement.setLong(1, creditCardTransaction.statementFileId());
                 preparedStatement.setString(2, creditCardTransaction.transactionType());
                 preparedStatement.setString(3, creditCardTransaction.customerName());
-                preparedStatement.setObject(4, creditCardTransaction.transactionDate());
-                preparedStatement.setObject(5, creditCardTransaction.transactionTime());
-                preparedStatement.setString(6, creditCardTransaction.description());
-                preparedStatement.setInt(7, creditCardTransaction.rewards());
-                preparedStatement.setBigDecimal(8, creditCardTransaction.amt());
-                preparedStatement.setString(9, creditCardTransaction.debitCredit());
-                preparedStatement.setInt(10, creditCardTransaction.sourceRowIndex());
+                preparedStatement.setObject(4, creditCardTransaction.transactionDateTime());
+                preparedStatement.setString(5, creditCardTransaction.description());
+                preparedStatement.setInt(6, creditCardTransaction.rewards());
+                preparedStatement.setBigDecimal(7, creditCardTransaction.amt());
+                preparedStatement.setString(8, creditCardTransaction.debitCredit());
+                preparedStatement.setInt(9, creditCardTransaction.sourceRowIndex());
                 preparedStatement.addBatch();
             }
             return preparedStatement.executeBatch();
@@ -65,8 +64,7 @@ public class CreditCardTransactionRepository {
                             statementFileId,
                             resultSet.getString("txn_type"),
                             resultSet.getString("customer_name"),
-                            resultSet.getDate("txn_date").toLocalDate(),
-                            resultSet.getTime("txn_time").toLocalTime(),
+                            resultSet.getTimestamp("txn_datetime").toLocalDateTime(),
                             resultSet.getString("description"),
                             resultSet.getInt("rewards"),
                             resultSet.getBigDecimal("amt"),

@@ -84,7 +84,7 @@ drop table account_statement_structure cascade;
 drop table creditcard_statement_structure cascade;
 drop table account_transaction cascade;
 drop table creditcard_transaction cascade;
-drop table creditcard_transaction_categorization cascade;
+
 
 update creditcard_transaction set transaction_categorization='' where statement_file_id=1 and id=1;
 

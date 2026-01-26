@@ -22,14 +22,14 @@ public class CreditCardTransactionCategorizationService {
                     description.contains("BLINKIT") ||
                     description.contains("RSP*INSTAMART BANGALORE ") ||
                     description.contains("INSTAMART")) {
-                transactionCategorization.append("category:grocery");
+                transactionCategorization.append("grocery");
                 transactionCategorization.append(";");
             }
             if (description.contains("FASTAG") ||
                     description.contains("HDFC BANK FASTAG MUMBAI ")) {
-                transactionCategorization.append("category:travel");
+                transactionCategorization.append("travel");
                 transactionCategorization.append(";");
-                transactionCategorization.append("category:parking");
+                transactionCategorization.append("parking");
                 transactionCategorization.append(";");
             }
             if (description.contains("FILLING STATION") ||
@@ -38,7 +38,7 @@ public class CreditCardTransactionCategorizationService {
                     description.contains("PETROL") ||
                     description.contains("ANAND FILLING STATION DELHI ") ||
                     description.contains("SHIV SHAKTI PETRO GURGAON ")) {
-                transactionCategorization.append("category:fuel");
+                transactionCategorization.append("fuel");
                 transactionCategorization.append(";");
             }
             if (description.contains("AMAZON WEB SERVICES") ||
@@ -51,7 +51,7 @@ public class CreditCardTransactionCategorizationService {
                     description.contains("cafe") ||
                     description.contains("restaurant") ||
                     description.contains("RESTAURANT") ||
-                    description.contains("cafe de flora") ||
+                    description.contains("Cafe De Flora") ||
                     description.contains("INDRA COFFEE ROASTER P RGURUGRAM ") ||
                     description.contains("KAMATHS NATURAL RETAIL NEW DELHI ") ||
                     description.contains("ICE CREAM COMPANY Gurgaon ") ||
@@ -63,27 +63,27 @@ public class CreditCardTransactionCategorizationService {
                     description.contains("RESTAURANT AMBRAI A UN UDAIPUR ") ||
                     description.contains("PPSL*Jubilant Foodwork Noida ") ||
                     description.contains("Jubilant")) {
-                transactionCategorization.append("category:dineout");
+                transactionCategorization.append("dineout");
                 transactionCategorization.append(";");
-                transactionCategorization.append("category:food");
+                transactionCategorization.append("food");
                 transactionCategorization.append(";");
             }
 
             if (description.contains("M S MICROTEK GREENBURG GURUGRAM ") ||
                     description.contains("MICROTEK GREENBURG")) {
-                transactionCategorization.append("category:housemaintenance");
+                transactionCategorization.append("housemaintenance");
                 transactionCategorization.append(";");
-                transactionCategorization.append("category:electricity");
+                transactionCategorization.append("electricity");
                 transactionCategorization.append(";");
             }
 
             if (description.contains("YOUTUBEGOOGLE MUMBAI ") ||
                     description.contains("YOUTUBE")) {
-                transactionCategorization.append("category:monthlysubscription");
+                transactionCategorization.append("monthlysubscription");
                 transactionCategorization.append(";");
-                transactionCategorization.append("category:entertainment");
+                transactionCategorization.append("entertainment");
                 transactionCategorization.append(";");
-                transactionCategorization.append("category:study");
+                transactionCategorization.append("study");
                 transactionCategorization.append(";");
             }
 
@@ -92,22 +92,22 @@ public class CreditCardTransactionCategorizationService {
                             (creditCardTransaction.amt() != null &&
                                     creditCardTransaction.amt().compareTo(new BigDecimal("1169")) == 1 &&
                                     creditCardTransaction.amt().compareTo(new BigDecimal("1181")) == -1)) {
-                transactionCategorization.append("category:monthly");
+                transactionCategorization.append("monthly");
                 transactionCategorization.append(";");
-                transactionCategorization.append("category:internet");
+                transactionCategorization.append("internet");
                 transactionCategorization.append(";");
             }
 
             if (description.contains("HOUSE OF DIAGNOSTICS H ENEW DELHI ") ||
                     description.contains("HOUSE OF DIAGNOSTICS")) {
-                transactionCategorization.append("category:medical");
+                transactionCategorization.append("medical");
                 transactionCategorization.append(";");
-                transactionCategorization.append("category:health");
+                transactionCategorization.append("health");
                 transactionCategorization.append(";");
             }
 
             if (description.contains("UDAIPUR")) {
-                transactionCategorization.append("category:travel");
+                transactionCategorization.append("travel");
                 transactionCategorization.append(";");
             }
 
@@ -119,7 +119,7 @@ public class CreditCardTransactionCategorizationService {
                     description.contains("MYNTRA DESIGNS PRIVATE BANGALORE ") ||
                     description.contains("MYNTRA") ||
                     description.contains("Myntra Designs Pvt Ltd BANGALORE ")) {
-                transactionCategorization.append("category:onlineshopping");
+                transactionCategorization.append("onlineshopping");
                 transactionCategorization.append(";");
             }
 

@@ -57,8 +57,6 @@ public class CreditCardTransactionReader {
                     LocalDateTime parsedLocalDateTime = LocalDateTime.parse(statementCellsByColIndex.get(
                                     creditCardStatementStructure.dateTimeColIndex()).rawValueText(),
                             dateTimeFormatter);
-                    LocalDate transactionDate = parsedLocalDateTime.toLocalDate();
-                    LocalTime transactionTime = parsedLocalDateTime.toLocalTime();
 
                     StatementCell descriptionCell = statementCellsByColIndex.get(creditCardStatementStructure.descriptionColIndex());
                     StatementCell rewardsCell = statementCellsByColIndex.get(creditCardStatementStructure.rewardsColIndex());
@@ -70,8 +68,7 @@ public class CreditCardTransactionReader {
                                     statementFileId,
                                     transactionTypeCell.rawValueText(),
                                     customerNameCell.rawValueText(),
-                                    transactionDate,
-                                    transactionTime,
+                                    parsedLocalDateTime,
                                     descriptionCell.rawValueText(),
                                     !rewardsCell.rawValueText().isBlank() ?
                                             Integer.parseInt(

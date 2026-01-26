@@ -1,4 +1,3 @@
-- date format correct in db save and on ui
 - search on description and category column
 - sponsor column introduction
 - decide by default how and what data will be loaded
