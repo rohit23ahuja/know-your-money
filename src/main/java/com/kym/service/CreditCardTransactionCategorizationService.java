@@ -22,14 +22,14 @@ public class CreditCardTransactionCategorizationService {
                     description.contains("BLINKIT") ||
                     description.contains("RSP*INSTAMART BANGALORE ") ||
                     description.contains("INSTAMART")) {
-                transactionCategorization.append("grocery");
+                transactionCategorization.append("Grocery");
                 transactionCategorization.append(";");
             }
             if (description.contains("FASTAG") ||
                     description.contains("HDFC BANK FASTAG MUMBAI ")) {
-                transactionCategorization.append("travel");
+                transactionCategorization.append("Travel");
                 transactionCategorization.append(";");
-                transactionCategorization.append("parking");
+                transactionCategorization.append("Parking");
                 transactionCategorization.append(";");
             }
             if (description.contains("FILLING STATION") ||
@@ -38,12 +38,12 @@ public class CreditCardTransactionCategorizationService {
                     description.contains("PETROL") ||
                     description.contains("ANAND FILLING STATION DELHI ") ||
                     description.contains("SHIV SHAKTI PETRO GURGAON ")) {
-                transactionCategorization.append("fuel");
+                transactionCategorization.append("Fuel");
                 transactionCategorization.append(";");
             }
             if (description.contains("AMAZON WEB SERVICES") ||
                     description.contains("AMAZON WEB SERVICES MUMBAI ")) {
-                transactionCategorization.append("category:study");
+                transactionCategorization.append("Study");
                 transactionCategorization.append(";");
             }
 
@@ -63,27 +63,27 @@ public class CreditCardTransactionCategorizationService {
                     description.contains("RESTAURANT AMBRAI A UN UDAIPUR ") ||
                     description.contains("PPSL*Jubilant Foodwork Noida ") ||
                     description.contains("Jubilant")) {
-                transactionCategorization.append("dineout");
+                transactionCategorization.append("Dineout");
                 transactionCategorization.append(";");
-                transactionCategorization.append("food");
+                transactionCategorization.append("Food");
                 transactionCategorization.append(";");
             }
 
             if (description.contains("M S MICROTEK GREENBURG GURUGRAM ") ||
                     description.contains("MICROTEK GREENBURG")) {
-                transactionCategorization.append("housemaintenance");
+                transactionCategorization.append("HouseMaintenance");
                 transactionCategorization.append(";");
-                transactionCategorization.append("electricity");
+                transactionCategorization.append("Electricity");
                 transactionCategorization.append(";");
             }
 
             if (description.contains("YOUTUBEGOOGLE MUMBAI ") ||
                     description.contains("YOUTUBE")) {
-                transactionCategorization.append("monthlysubscription");
+                transactionCategorization.append("MonthlySubscription");
                 transactionCategorization.append(";");
-                transactionCategorization.append("entertainment");
+                transactionCategorization.append("Entertainment");
                 transactionCategorization.append(";");
-                transactionCategorization.append("study");
+                transactionCategorization.append("Study");
                 transactionCategorization.append(";");
             }
 
@@ -92,22 +92,22 @@ public class CreditCardTransactionCategorizationService {
                             (creditCardTransaction.amt() != null &&
                                     creditCardTransaction.amt().compareTo(new BigDecimal("1169")) == 1 &&
                                     creditCardTransaction.amt().compareTo(new BigDecimal("1181")) == -1)) {
-                transactionCategorization.append("monthly");
+                transactionCategorization.append("Monthly");
                 transactionCategorization.append(";");
-                transactionCategorization.append("internet");
+                transactionCategorization.append("Internet");
                 transactionCategorization.append(";");
             }
 
             if (description.contains("HOUSE OF DIAGNOSTICS H ENEW DELHI ") ||
                     description.contains("HOUSE OF DIAGNOSTICS")) {
-                transactionCategorization.append("medical");
+                transactionCategorization.append("Medical");
                 transactionCategorization.append(";");
-                transactionCategorization.append("health");
+                transactionCategorization.append("Health");
                 transactionCategorization.append(";");
             }
 
             if (description.contains("UDAIPUR")) {
-                transactionCategorization.append("travel");
+                transactionCategorization.append("Travel");
                 transactionCategorization.append(";");
             }
 
@@ -119,7 +119,7 @@ public class CreditCardTransactionCategorizationService {
                     description.contains("MYNTRA DESIGNS PRIVATE BANGALORE ") ||
                     description.contains("MYNTRA") ||
                     description.contains("Myntra Designs Pvt Ltd BANGALORE ")) {
-                transactionCategorization.append("onlineshopping");
+                transactionCategorization.append("OnlineShopping");
                 transactionCategorization.append(";");
             }
 
