@@ -123,6 +123,10 @@ public class CreditCardTransactionCategorizationService {
                 transactionCategorization.append(";");
             }
 
+            if (creditCardTransaction.transactionType().contains("International")) {
+                transactionCategorization.append("InternationalTransaction");
+                transactionCategorization.append(";");
+            }
             creditCardTransactionCategorizations.add(new CreditCardTransactionCategorization(
                     creditCardTransaction.statementFileId(),
                     creditCardTransaction.id(),
