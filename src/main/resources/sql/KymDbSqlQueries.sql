@@ -41,6 +41,7 @@ creditcard_transaction(statement_file_id, txn_type, customer_name, txn_date, txn
 values (1, 'Domestic', 'Rohit', '10-11-2025', '14:30', 'Swiggy', -30, 300.30, null, 23);
 
 select * from creditcard_transaction;
+select * from statement_file;
 
 truncate table statement_file cascade;
 
