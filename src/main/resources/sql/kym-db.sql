@@ -1,5 +1,4 @@
-CREATE TABLE statement_file
-(
+CREATE TABLE IF NOT EXISTS statement_file (
     id                BIGSERIAL PRIMARY KEY,
     account_name      VARCHAR(100)  NOT NULL,
     account_number    VARCHAR(64)  NOT NULL,
@@ -9,7 +8,7 @@ CREATE TABLE statement_file
     uploaded_at       TIMESTAMPTZ  NOT NULL DEFAULT now()
 );
 
-CREATE TABLE statement_cell(
+CREATE TABLE IF NOT EXISTS statement_cell(
     id                BIGSERIAL PRIMARY KEY,
     statement_file_id BIGINT       NOT NULL
         REFERENCES statement_file (id) ON DELETE CASCADE,
@@ -20,7 +19,7 @@ CREATE TABLE statement_cell(
     created_at        TIMESTAMPTZ  NOT NULL DEFAULT now()
 );
 
-CREATE TABLE account_statement_structure (
+CREATE TABLE IF NOT EXISTS account_statement_structure (
     id BIGSERIAL PRIMARY KEY,
     statement_file_id BIGINT NOT NULL
         REFERENCES statement_file(id) ON DELETE CASCADE,
@@ -35,7 +34,7 @@ CREATE TABLE account_statement_structure (
     detected_at TIMESTAMPTZ NOT NULL DEFAULT now()
 );
 
-CREATE TABLE creditcard_statement_structure (
+CREATE TABLE IF NOT EXISTS creditcard_statement_structure (
     id BIGSERIAL PRIMARY KEY,
     statement_file_id BIGINT NOT NULL
         REFERENCES statement_file(id) ON DELETE CASCADE,
@@ -52,7 +51,7 @@ CREATE TABLE creditcard_statement_structure (
     detected_at TIMESTAMPTZ NOT NULL DEFAULT now()
 );
 
-CREATE TABLE account_transaction (
+CREATE TABLE IF NOT EXISTS account_transaction (
     id BIGSERIAL PRIMARY KEY,
     statement_file_id BIGINT NOT NULL
         REFERENCES statement_file(id) ON DELETE CASCADE,
@@ -65,7 +64,7 @@ CREATE TABLE account_transaction (
     created_at TIMESTAMPTZ NOT NULL DEFAULT now()
 );
 
-CREATE TABLE creditcard_transaction (
+CREATE TABLE IF NOT EXISTS creditcard_transaction (
     id BIGSERIAL PRIMARY KEY,
     statement_file_id BIGINT NOT NULL
         REFERENCES statement_file(id) ON DELETE CASCADE,
