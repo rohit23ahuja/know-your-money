@@ -29,15 +29,16 @@ public class AccountTransactionReader {
 
     public AccountTransactionReader(long statementFileId) {
         this.statementFileId = statementFileId;
-        statementCellWriter = new StatementCellWriter(statementFileId);
+        statementCellWriter = new StatementCellWriter();
         accountStatementStructureWriter = new AccountStatementStructureWriter(statementFileId);
         accountTransactionRepository = new AccountTransactionRepository();
     }
 
 
-    public void readTransactions() {
+    public void readTransactions(long statementFileId) {
         AccountStatementStructure accountStatementStructure = accountStatementStructureWriter.getStatementStructure();
         List<StatementCell> statementCells = statementCellWriter.getStatementCells(
+                statementFileId,
                 accountStatementStructure.dataStartRowIndex(),
                 accountStatementStructure.dataEndRowIndex());
         Map<Integer, List<StatementCell>> statementCellsByRowIndex = statementCells.stream().collect(Collectors.groupingBy(StatementCell::rowIndex));

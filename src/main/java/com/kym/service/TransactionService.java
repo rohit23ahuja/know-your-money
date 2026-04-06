@@ -20,10 +20,10 @@ public class TransactionService {
 
         if("credit-card-statement".equals(statementFile.statementType())) {
             CreditCardTransactionReader creditCardTransactionReader = new CreditCardTransactionReader(statementFileId);
-            creditCardTransactionReader.readTransactions();
+            creditCardTransactionReader.readTransactions(statementFileId);
         } else {
             AccountTransactionReader accountTransactionReader = new AccountTransactionReader(statementFileId);
-            accountTransactionReader.readTransactions();
+            accountTransactionReader.readTransactions(statementFileId);
         }
     }
 }

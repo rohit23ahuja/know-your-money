@@ -25,7 +25,7 @@ public class CreditCardTransactionReader {
 
     public CreditCardTransactionReader(long statementFileId) {
         this.statementFileId = statementFileId;
-        this.statementCellWriter = new StatementCellWriter(statementFileId);
+        this.statementCellWriter = new StatementCellWriter();
         this.creditCardStatementStructureWriter = new CreditCardStatementStructureWriter(statementFileId);
         this.creditCardTransactionRepository = new CreditCardTransactionRepository(statementFileId);
     }
@@ -35,9 +35,10 @@ public class CreditCardTransactionReader {
         return new BigDecimal(text.replace(",", ""));
     }
 
-    public void readTransactions() {
+    public void readTransactions(long statementFileId) {
         CreditCardStatementStructure creditCardStatementStructure = creditCardStatementStructureWriter.getCreditCardStatementStructure();
         List<StatementCell> statementCells = statementCellWriter.getStatementCells(
+                statementFileId,
                 creditCardStatementStructure.dataStartRowIndex(),
                 creditCardStatementStructure.dataEndRowIndex());
         Map<Integer, List<StatementCell>> statementCellsByRowIndex = statementCells.stream().collect(Collectors.groupingBy(StatementCell::rowIndex));

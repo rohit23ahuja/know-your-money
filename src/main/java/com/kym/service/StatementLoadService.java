@@ -23,8 +23,8 @@ public class StatementLoadService {
         StatementFile statementFile = new StatementFile(accountName, accountNumber, statementType, bankCode, originalFileName);
         long statementFileId = statementFileWriter.writeStatementFile(statementFile);
         List<StatementCell> statementCells = statementCellReader.readStatementCells(statementFileId, originalFileName);
-        StatementCellWriter statementCellWriter = new StatementCellWriter(statementFileId);
-        int[] updateCount = statementCellWriter.writeStatementCells(statementCells);
+        StatementCellWriter statementCellWriter = new StatementCellWriter();
+        int[] updateCount = statementCellWriter.writeStatementCells(statementFileId, statementCells);
         return  statementFileId;
     }
 }

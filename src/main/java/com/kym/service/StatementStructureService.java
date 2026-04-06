@@ -21,12 +21,12 @@ public class StatementStructureService {
 
     public StatementStructureService(long statementFileId) {
         this.statementFileId = statementFileId;
-        statementCellWriter = new StatementCellWriter(statementFileId);
+        statementCellWriter = new StatementCellWriter();
         statementFileWriter = new StatementFileWriter();
     }
 
     public void detectStatementStructure() {
-        List<StatementCell> statementCells = statementCellWriter.getStatementCells();
+        List<StatementCell> statementCells = statementCellWriter.getStatementCells(statementFileId);
         StatementFile statementFile = statementFileWriter.getStatementFile(statementFileId);
         if("credit-card-statement".equals(statementFile.statementType())) {
             CreditCardStatementStructureDetector creditCardStatementStructureDetector = new CreditCardStatementStructureDetector(statementFileId);
