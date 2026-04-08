@@ -36,6 +36,8 @@ public class CreditCardTransaction {
 
     private String transactionCategorization;
 
+    public CreditCardTransaction(){}
+
     public CreditCardTransaction(long statementFileId,
                                  String txnType,
                                  String customerName,
