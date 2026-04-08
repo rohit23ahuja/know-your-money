@@ -1,98 +1,13 @@
 package com.kym.repository;
 
-import com.kym.model.CreditCardTransaction;
-import com.kym.model.CreditCardTransactionCategorization;
+import com.kym.entity.CreditCardTransaction;
+import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.stereotype.Repository;
 
-import java.sql.*;
-import java.util.ArrayList;
 import java.util.List;
 
-import static com.kym.util.Constants.*;
+@Repository
+public interface CreditCardTransactionRepository extends JpaRepository<CreditCardTransaction, Long> {
 
-public class CreditCardTransactionRepository {
-    private static final String SQL_INSERT_CREDIT_CARD_TRANSACTION = """
-            insert into 
-            creditcard_transaction(statement_file_id, txn_type, customer_name, txn_datetime, description, rewards, amt, debit_credit, source_row_index)
-            values (?, ?, ?, ?, ?, ?, ?, ?, ?);
-            """;
-
-    private static final String SQL_SELECT_CREDIT_CARD_TRANSACATION = """
-            select 
-            statement_file_id, txn_type, customer_name, txn_datetime, description, rewards, amt, debit_credit, source_row_index, id 
-            from creditcard_transaction where statement_file_id = ? order by id;
-            """;
-
-    private static final String SQL_UPDATE_CREDIT_CARD_TRANSACTION = """
-            update creditcard_transaction set transaction_categorization = ? where statement_file_id = ? and id = ?;
-            """;
-    private final long statementFileId;
-
-    public CreditCardTransactionRepository(long statementFileId) {
-        this.statementFileId = statementFileId;
-    }
-
-    public int[] save(List<CreditCardTransaction> creditCardTransactions) {
-        try (Connection connection = DriverManager.getConnection(
-                JDBC_URL, POSTGRES_USER, POSTGRES_PASSWORD);
-             PreparedStatement preparedStatement = connection.prepareStatement(SQL_INSERT_CREDIT_CARD_TRANSACTION)) {
-            for (CreditCardTransaction creditCardTransaction : creditCardTransactions) {
-                preparedStatement.setLong(1, creditCardTransaction.statementFileId());
-                preparedStatement.setString(2, creditCardTransaction.transactionType());
-                preparedStatement.setString(3, creditCardTransaction.customerName());
-                preparedStatement.setObject(4, creditCardTransaction.transactionDateTime());
-                preparedStatement.setString(5, creditCardTransaction.description());
-                preparedStatement.setInt(6, creditCardTransaction.rewards());
-                preparedStatement.setBigDecimal(7, creditCardTransaction.amt());
-                preparedStatement.setString(8, creditCardTransaction.debitCredit());
-                preparedStatement.setInt(9, creditCardTransaction.sourceRowIndex());
-                preparedStatement.addBatch();
-            }
-            return preparedStatement.executeBatch();
-        } catch (SQLException e) {
-            throw new RuntimeException("Exception occurred while saving credit card transactions.", e);
-        }
-    }
-
-    public List<CreditCardTransaction> getCreditCardTransactions() {
-        try (Connection connection = DriverManager.getConnection(JDBC_URL, POSTGRES_USER, POSTGRES_PASSWORD);
-             PreparedStatement preparedStatement = connection.prepareStatement(SQL_SELECT_CREDIT_CARD_TRANSACATION)) {
-            List<CreditCardTransaction> creditCardTransactions = new ArrayList<>();
-            preparedStatement.setLong(1, statementFileId);
-            try (ResultSet resultSet = preparedStatement.executeQuery()) {
-                while (resultSet.next()) {
-                    creditCardTransactions.add(new CreditCardTransaction(
-                            statementFileId,
-                            resultSet.getString("txn_type"),
-                            resultSet.getString("customer_name"),
-                            resultSet.getTimestamp("txn_datetime").toLocalDateTime(),
-                            resultSet.getString("description"),
-                            resultSet.getInt("rewards"),
-                            resultSet.getBigDecimal("amt"),
-                            resultSet.getString("debit_credit"),
-                            resultSet.getInt("source_row_index"),
-                            resultSet.getLong("id"),
-                            null
-                    ));
-                }
-            }
-            return creditCardTransactions;
-        } catch (SQLException e) {
-            throw new RuntimeException("Exception occurred while fetching credit card transaction for statement file id " + statementFileId, e);
-        }
-    }
-
-    public int[] update(List<CreditCardTransactionCategorization> creditCardTransactionCategorizations) {
-        try (Connection connection = DriverManager.getConnection(JDBC_URL, POSTGRES_USER, POSTGRES_PASSWORD);
-             PreparedStatement preparedStatement = connection.prepareStatement(SQL_UPDATE_CREDIT_CARD_TRANSACTION)) {
-            for (CreditCardTransactionCategorization creditCardTransactionCategorization : creditCardTransactionCategorizations) {
-                preparedStatement.setString(1, creditCardTransactionCategorization.transactionCategorization());
-                preparedStatement.setLong(2, creditCardTransactionCategorization.statementFileId());
-                preparedStatement.setLong(3, creditCardTransactionCategorization.transactionId());
-                preparedStatement.addBatch();
-            }
-            return preparedStatement.executeBatch();
-        } catch (SQLException e) {
-            throw new RuntimeException("Exception occurred while updating credit card transaction categorizations");
-        }
-    }
+    List<CreditCardTransaction> findByStatementFileId(Long statementFileId);
 }

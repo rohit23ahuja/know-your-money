@@ -1,33 +1,34 @@
 package com.kym.reader;
 
-import com.kym.model.CreditCardStatementStructure;
-import com.kym.model.CreditCardTransaction;
-import com.kym.model.StatementCell;
+import com.kym.entity.CreditCardTransaction;
+import com.kym.entity.CreditCardStatementStructure;
+import com.kym.entity.StatementCell;
 import com.kym.repository.CreditCardTransactionRepository;
-import com.kym.writer.CreditCardStatementStructureWriter;
-import com.kym.writer.StatementCellWriter;
+import com.kym.repository.CreditCardStatementStructureRepository;
+import com.kym.repository.StatementCellRepository;
+import org.springframework.stereotype.Component;
 
 import java.math.BigDecimal;
-import java.time.LocalDate;
 import java.time.LocalDateTime;
-import java.time.LocalTime;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 
+@Component
 public class CreditCardTransactionReader {
-    private final StatementCellWriter statementCellWriter;
-    private final CreditCardStatementStructureWriter creditCardStatementStructureWriter;
-    private final CreditCardTransactionRepository creditCardTransactionRepository;
-    private final Long statementFileId;
 
-    public CreditCardTransactionReader(long statementFileId) {
-        this.statementFileId = statementFileId;
-        this.statementCellWriter = new StatementCellWriter();
-        this.creditCardStatementStructureWriter = new CreditCardStatementStructureWriter(statementFileId);
-        this.creditCardTransactionRepository = new CreditCardTransactionRepository(statementFileId);
+    private final StatementCellRepository statementCellRepository;
+    private final CreditCardStatementStructureRepository creditCardStatementStructureRepository;
+    private final CreditCardTransactionRepository creditCardTransactionRepository;
+
+    public CreditCardTransactionReader(StatementCellRepository statementCellRepository,
+                                       CreditCardStatementStructureRepository creditCardStatementStructureRepository,
+                                       CreditCardTransactionRepository creditCardTransactionRepository) {
+        this.statementCellRepository = statementCellRepository;
+        this.creditCardStatementStructureRepository = creditCardStatementStructureRepository;
+        this.creditCardTransactionRepository = creditCardTransactionRepository;
     }
 
     private static BigDecimal parseAmount(String text) {
@@ -36,12 +37,12 @@ public class CreditCardTransactionReader {
     }
 
     public void readTransactions(long statementFileId) {
-        CreditCardStatementStructure creditCardStatementStructure = creditCardStatementStructureWriter.getCreditCardStatementStructure();
-        List<StatementCell> statementCells = statementCellWriter.getStatementCells(
+        CreditCardStatementStructure creditCardStatementStructure = creditCardStatementStructureRepository.findByStatementFileId(statementFileId);
+        List<StatementCell> statementCells = statementCellRepository.findStatementCellsInRowRange(
                 statementFileId,
-                creditCardStatementStructure.dataStartRowIndex(),
-                creditCardStatementStructure.dataEndRowIndex());
-        Map<Integer, List<StatementCell>> statementCellsByRowIndex = statementCells.stream().collect(Collectors.groupingBy(StatementCell::rowIndex));
+                creditCardStatementStructure.getDataStartRowIndex(),
+                creditCardStatementStructure.getDataEndRowIndex());
+        Map<Integer, List<StatementCell>> statementCellsByRowIndex = statementCells.stream().collect(Collectors.groupingBy(StatementCell::getRowIndex));
 
         List<CreditCardTransaction> creditCardTransactions = new ArrayList<>();
         statementCellsByRowIndex.entrySet()
@@ -50,36 +51,35 @@ public class CreditCardTransactionReader {
                 .forEach(statementCellEntry -> {
                     Map<Integer, StatementCell> statementCellsByColIndex =
                             statementCellEntry.getValue().stream()
-                                    .collect(Collectors.toMap(StatementCell::columnIndex, c -> c));
-                    StatementCell transactionTypeCell = statementCellsByColIndex.get(creditCardStatementStructure.transactionTypeColIndex());
-                    StatementCell customerNameCell = statementCellsByColIndex.get(creditCardStatementStructure.customerNameColIndex());
+                                    .collect(Collectors.toMap(StatementCell::getColumnIndex, c -> c));
+                    StatementCell transactionTypeCell = statementCellsByColIndex.get(creditCardStatementStructure.getTransactionTypeColIndex());
+                    StatementCell customerNameCell = statementCellsByColIndex.get(creditCardStatementStructure.getCustomerNameColIndex());
 
                     DateTimeFormatter dateTimeFormatter = DateTimeFormatter.ofPattern("dd/MM/yyyy / HH:mm");
                     LocalDateTime parsedLocalDateTime = LocalDateTime.parse(statementCellsByColIndex.get(
-                                    creditCardStatementStructure.dateTimeColIndex()).rawValueText(),
+                                    creditCardStatementStructure.getDateTimeColIndex()).getRawValueText(),
                             dateTimeFormatter);
 
-                    StatementCell descriptionCell = statementCellsByColIndex.get(creditCardStatementStructure.descriptionColIndex());
-                    StatementCell rewardsCell = statementCellsByColIndex.get(creditCardStatementStructure.rewardsColIndex());
-                    StatementCell amtCell = statementCellsByColIndex.get(creditCardStatementStructure.amtColIndex());
-                    StatementCell debitCreditCell = statementCellsByColIndex.get(creditCardStatementStructure.debitCreditColIndex());
+                    StatementCell descriptionCell = statementCellsByColIndex.get(creditCardStatementStructure.getDescriptionColIndex());
+                    StatementCell rewardsCell = statementCellsByColIndex.get(creditCardStatementStructure.getRewardsColIndex());
+                    StatementCell amtCell = statementCellsByColIndex.get(creditCardStatementStructure.getAmtColIndex());
+                    StatementCell debitCreditCell = statementCellsByColIndex.get(creditCardStatementStructure.getDebitCreditColIndex());
 
                     creditCardTransactions.add(
                             new CreditCardTransaction(
                                     statementFileId,
-                                    transactionTypeCell.rawValueText(),
-                                    customerNameCell.rawValueText(),
+                                    transactionTypeCell.getRawValueText(),
+                                    customerNameCell.getRawValueText(),
                                     parsedLocalDateTime,
-                                    descriptionCell.rawValueText(),
-                                    !rewardsCell.rawValueText().isBlank() ?
+                                    descriptionCell.getRawValueText(),
+                                    !rewardsCell.getRawValueText().isBlank() ?
                                             Integer.parseInt(
-                                                    rewardsCell.rawValueText().replace(" ", "")) : 0,
-                                    amtCell != null ? parseAmount(amtCell.rawValueText()) : null,
-                                    debitCreditCell.rawValueText(),
-                                    statementCellEntry.getKey(),
-                                    0L, null));
+                                                    rewardsCell.getRawValueText().replace(" ", "")) : 0,
+                                    amtCell != null ? parseAmount(amtCell.getRawValueText()) : null,
+                                    debitCreditCell.getRawValueText(),
+                                    statementCellEntry.getKey()));
                 });
-        creditCardTransactionRepository.save(creditCardTransactions);
+        creditCardTransactionRepository.saveAll(creditCardTransactions);
 
     }
 }

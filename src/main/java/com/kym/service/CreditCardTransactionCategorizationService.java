@@ -1,19 +1,21 @@
 package com.kym.service;
 
-import com.kym.model.CreditCardTransaction;
-import com.kym.model.CreditCardTransactionCategorization;
+import com.kym.entity.CreditCardTransaction;
+import com.kym.dto.CreditCardTransactionCategorization;
+import org.springframework.stereotype.Service;
 
 import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.List;
 
+@Service
 public class CreditCardTransactionCategorizationService {
 
     public List<CreditCardTransactionCategorization> categorize(List<CreditCardTransaction> creditCardTransactions) {
         List<CreditCardTransactionCategorization> creditCardTransactionCategorizations = new ArrayList<>();
         for (CreditCardTransaction creditCardTransaction : creditCardTransactions) {
             StringBuilder transactionCategorization = new StringBuilder();
-            String description = creditCardTransaction.description();
+            String description = creditCardTransaction.getDescription();
             if (description.contains("Instamart") ||
                     description.contains("Payu*Instamart Grocery Bangalore ") ||
                     description.contains("ZEPTO MARKETPLACE PRIV Bangalore ") ||
@@ -89,9 +91,9 @@ public class CreditCardTransactionCategorizationService {
 
             if (description.contains("BHARTI AIRTEL LTD GURGAON ") ||
                     description.contains("BHARTI AIRTEL") &&
-                            (creditCardTransaction.amt() != null &&
-                                    creditCardTransaction.amt().compareTo(new BigDecimal("1169")) == 1 &&
-                                    creditCardTransaction.amt().compareTo(new BigDecimal("1181")) == -1)) {
+                            (creditCardTransaction.getAmt() != null &&
+                                    creditCardTransaction.getAmt().compareTo(new BigDecimal("1169")) == 1 &&
+                                    creditCardTransaction.getAmt().compareTo(new BigDecimal("1181")) == -1)) {
                 transactionCategorization.append("Monthly");
                 transactionCategorization.append(";");
                 transactionCategorization.append("Internet");
@@ -123,13 +125,13 @@ public class CreditCardTransactionCategorizationService {
                 transactionCategorization.append(";");
             }
 
-            if (creditCardTransaction.transactionType().contains("International")) {
+            if (creditCardTransaction.getTxnType().contains("International")) {
                 transactionCategorization.append("InternationalTransaction");
                 transactionCategorization.append(";");
             }
             creditCardTransactionCategorizations.add(new CreditCardTransactionCategorization(
-                    creditCardTransaction.statementFileId(),
-                    creditCardTransaction.id(),
+                    creditCardTransaction.getStatementFileId(),
+                    creditCardTransaction.getId(),
                     transactionCategorization.toString()
             ));
         }

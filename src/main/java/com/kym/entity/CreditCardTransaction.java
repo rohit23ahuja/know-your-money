@@ -12,7 +12,7 @@ import java.time.LocalDateTime;
 @Entity
 @Immutable
 @Table(name = "creditcard_transaction")
-public class CreditCardTransaction2 {
+public class CreditCardTransaction {
 
     @Id
     private Long id;
@@ -34,7 +34,29 @@ public class CreditCardTransaction2 {
 
     private String debitCredit;
 
+    private Integer sourceRowIndex;
+
     private String transactionCategorization;
+
+    public CreditCardTransaction(long statementFileId,
+                                 String txnType,
+                                 String customerName,
+                                 LocalDateTime txnDateTime,
+                                 String description,
+                                 int rewards,
+                                 BigDecimal amt,
+                                 String debitCredit,
+                                 Integer sourceRowIndex) {
+        this.statementFileId=statementFileId;
+        this.txnType=txnType;
+        this.customerName=customerName;
+        this.txnDateTime=txnDateTime;
+        this.description=description;
+        this.rewards=rewards;
+        this.amt=amt;
+        this.debitCredit=debitCredit;
+        this.sourceRowIndex=sourceRowIndex;
+    }
 
     public Long getId() {
         return id;

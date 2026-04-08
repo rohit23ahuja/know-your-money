@@ -1,11 +1,12 @@
 package com.kym.reader;
 
-import com.kym.model.AccountTransaction;
-import com.kym.model.StatementCell;
-import com.kym.model.AccountStatementStructure;
+import com.kym.entity.AccountTransaction;
+import com.kym.entity.StatementCell;
+import com.kym.entity.AccountStatementStructure;
 import com.kym.repository.AccountTransactionRepository;
-import com.kym.writer.StatementCellWriter;
-import com.kym.writer.AccountStatementStructureWriter;
+import com.kym.repository.StatementCellRepository;
+import com.kym.repository.AccountStatementStructureRepository;
+import org.springframework.stereotype.Component;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
@@ -17,31 +18,32 @@ import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 
+@Component
 public class AccountTransactionReader {
     private static final DateTimeFormatter STATEMENT_DATE_FORMAT =
             DateTimeFormatter.ofPattern("dd/MM/uu")
                     .withResolverStyle(ResolverStyle.STRICT);
 
-    private final StatementCellWriter statementCellWriter;
-    private final AccountStatementStructureWriter accountStatementStructureWriter;
+    private final StatementCellRepository statementCellRepository;
+    private final AccountStatementStructureRepository accountStatementStructureRepository;
     private final AccountTransactionRepository accountTransactionRepository;
-    private final Long statementFileId;
 
-    public AccountTransactionReader(long statementFileId) {
-        this.statementFileId = statementFileId;
-        statementCellWriter = new StatementCellWriter();
-        accountStatementStructureWriter = new AccountStatementStructureWriter(statementFileId);
-        accountTransactionRepository = new AccountTransactionRepository();
+    public AccountTransactionReader(StatementCellRepository statementCellRepository,
+                                    AccountStatementStructureRepository accountStatementStructureRepository,
+                                    AccountTransactionRepository accountTransactionRepository) {
+        this.statementCellRepository = statementCellRepository;
+        this.accountStatementStructureRepository = accountStatementStructureRepository;
+        this.accountTransactionRepository = accountTransactionRepository;
     }
 
 
     public void readTransactions(long statementFileId) {
-        AccountStatementStructure accountStatementStructure = accountStatementStructureWriter.getStatementStructure();
-        List<StatementCell> statementCells = statementCellWriter.getStatementCells(
+        AccountStatementStructure accountStatementStructure = accountStatementStructureRepository.findByStatementFileId(statementFileId).get();
+        List<StatementCell> statementCells = statementCellRepository.findStatementCellsInRowRange(
                 statementFileId,
-                accountStatementStructure.dataStartRowIndex(),
-                accountStatementStructure.dataEndRowIndex());
-        Map<Integer, List<StatementCell>> statementCellsByRowIndex = statementCells.stream().collect(Collectors.groupingBy(StatementCell::rowIndex));
+                accountStatementStructure.getDataStartRowIndex(),
+                accountStatementStructure.getDataEndRowIndex());
+        Map<Integer, List<StatementCell>> statementCellsByRowIndex = statementCells.stream().collect(Collectors.groupingBy(StatementCell::getRowIndex));
 
         List<AccountTransaction> accountTransactions = new ArrayList<>();
         statementCellsByRowIndex.entrySet()
@@ -50,12 +52,12 @@ public class AccountTransactionReader {
                 .forEach(statementCellEntry -> {
                     Map<Integer, StatementCell> cellsByColumnIndex =
                             statementCellEntry.getValue().stream()
-                                    .collect(Collectors.toMap(StatementCell::columnIndex, c -> c));
-                    StatementCell dateCell = cellsByColumnIndex.get(accountStatementStructure.dateColIndex());
-                    StatementCell narrationCell = cellsByColumnIndex.get(accountStatementStructure.narrationColIndex());
-                    StatementCell debitCell = cellsByColumnIndex.get(accountStatementStructure.debitColIndex());
-                    StatementCell creditCell = cellsByColumnIndex.get(accountStatementStructure.creditColIndex());
-                    StatementCell balanceCell = cellsByColumnIndex.get(accountStatementStructure.balanceColIndex());
+                                    .collect(Collectors.toMap(StatementCell::getColumnIndex, c -> c));
+                    StatementCell dateCell = cellsByColumnIndex.get(accountStatementStructure.getDateColIndex());
+                    StatementCell narrationCell = cellsByColumnIndex.get(accountStatementStructure.getNarrationColIndex());
+                    StatementCell debitCell = cellsByColumnIndex.get(accountStatementStructure.getDebitColIndex());
+                    StatementCell creditCell = cellsByColumnIndex.get(accountStatementStructure.getCreditColIndex());
+                    StatementCell balanceCell = cellsByColumnIndex.get(accountStatementStructure.getBalanceColIndex());
 
                     if(dateCell == null || narrationCell == null || balanceCell == null) {
                         throw new RuntimeException("Mandatory column missing at row "+statementCellEntry.getKey());
@@ -63,23 +65,23 @@ public class AccountTransactionReader {
 
                     LocalDate txnDate;
                     try {
-                        txnDate = LocalDate.parse(dateCell.rawValueText(), STATEMENT_DATE_FORMAT);
+                        txnDate = LocalDate.parse(dateCell.getRawValueText(), STATEMENT_DATE_FORMAT);
                     } catch (DateTimeParseException e) {
                         throw new RuntimeException(
-                                "Invalid date format: " + dateCell.rawValueText() + ", expected dd/MM/uu", e
+                                "Invalid date format: " + dateCell.getRawValueText() + ", expected dd/MM/uu", e
                         );
                     }
                     accountTransactions.add(
                             new AccountTransaction(
                                     statementFileId,
                                     txnDate,
-                                    narrationCell.rawValueText(),
-                                    parseAmount(debitCell!=null?debitCell.rawValueText():null),
-                                    parseAmount(creditCell!=null?creditCell.rawValueText():null),
-                                    parseAmount(balanceCell.rawValueText()),
+                                    narrationCell.getRawValueText(),
+                                    parseAmount(debitCell!=null?debitCell.getRawValueText():null),
+                                    parseAmount(creditCell!=null?creditCell.getRawValueText():null),
+                                    parseAmount(balanceCell.getRawValueText()),
                                     statementCellEntry.getKey()));
                 });
-        accountTransactionRepository.save(accountTransactions);
+        accountTransactionRepository.saveAll(accountTransactions);
     }
 
     private static BigDecimal parseAmount(String text) {

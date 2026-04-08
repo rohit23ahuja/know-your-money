@@ -2,42 +2,52 @@ package com.kym.service;
 
 import com.kym.detector.AccountStatementStructureDetector;
 import com.kym.detector.CreditCardStatementStructureDetector;
-import com.kym.model.CreditCardStatementStructure;
-import com.kym.model.StatementCell;
-import com.kym.model.StatementFile;
-import com.kym.model.AccountStatementStructure;
-import com.kym.writer.CreditCardStatementStructureWriter;
-import com.kym.writer.StatementCellWriter;
-import com.kym.writer.StatementFileWriter;
-import com.kym.writer.AccountStatementStructureWriter;
+import com.kym.entity.CreditCardStatementStructure;
+import com.kym.entity.StatementCell;
+import com.kym.entity.StatementFile;
+import com.kym.entity.AccountStatementStructure;
+import com.kym.repository.CreditCardStatementStructureRepository;
+import com.kym.repository.StatementCellRepository;
+import com.kym.repository.StatementFileRepository;
+import com.kym.repository.AccountStatementStructureRepository;
+import org.springframework.stereotype.Service;
 
 import java.util.List;
 
+@Service
 public class StatementStructureService {
 
-    private final long statementFileId;
-    private final StatementCellWriter statementCellWriter;
-    private final StatementFileWriter statementFileWriter;
+    private final StatementCellRepository statementCellRepository;
+    private final StatementFileRepository statementFileRepository;
+    private final CreditCardStatementStructureDetector creditCardStatementStructureDetector;
+    private final CreditCardStatementStructureRepository creditCardStatementStructureRepository;
+    private final AccountStatementStructureDetector accountStatementStructureDetector;
+    private final AccountStatementStructureRepository accountStatementStructureRepository;
 
-    public StatementStructureService(long statementFileId) {
-        this.statementFileId = statementFileId;
-        statementCellWriter = new StatementCellWriter();
-        statementFileWriter = new StatementFileWriter();
+    public StatementStructureService(StatementCellRepository statementCellRepository,
+                                     StatementFileRepository statementFileRepository,
+                                     CreditCardStatementStructureDetector creditCardStatementStructureDetector,
+                                     CreditCardStatementStructureRepository creditCardStatementStructureRepository,
+                                     AccountStatementStructureDetector accountStatementStructureDetector,
+                                     AccountStatementStructureRepository accountStatementStructureRepository) {
+        this.statementCellRepository = statementCellRepository;
+        this.statementFileRepository = statementFileRepository;
+        this.creditCardStatementStructureDetector = creditCardStatementStructureDetector;
+        this.creditCardStatementStructureRepository = creditCardStatementStructureRepository;
+        this.accountStatementStructureDetector = accountStatementStructureDetector;
+        this.accountStatementStructureRepository = accountStatementStructureRepository;
     }
 
-    public void detectStatementStructure() {
-        List<StatementCell> statementCells = statementCellWriter.getStatementCells(statementFileId);
-        StatementFile statementFile = statementFileWriter.getStatementFile(statementFileId);
-        if("credit-card-statement".equals(statementFile.statementType())) {
-            CreditCardStatementStructureDetector creditCardStatementStructureDetector = new CreditCardStatementStructureDetector(statementFileId);
-            CreditCardStatementStructure creditCardStatementStructure = creditCardStatementStructureDetector.detect(statementCells);
-            CreditCardStatementStructureWriter creditCardStatementStructureWriter = new CreditCardStatementStructureWriter(statementFileId);
-            creditCardStatementStructureWriter.write(creditCardStatementStructure);
+
+    public void detectStatementStructure(long statementFileId) {
+        List<StatementCell> statementCells = statementCellRepository.findByStatementFileId(statementFileId);
+        StatementFile statementFile = statementFileRepository.findById(statementFileId).get();
+        if("credit-card-statement".equals(statementFile.getStatementType())) {
+            CreditCardStatementStructure creditCardStatementStructure = creditCardStatementStructureDetector.detect(statementFileId, statementCells);
+            creditCardStatementStructureRepository.save(creditCardStatementStructure);
         } else {
-            AccountStatementStructureDetector accountStatementStructureDetector = new AccountStatementStructureDetector(statementFileId);
-            AccountStatementStructure accountStatementStructure = accountStatementStructureDetector.detect(statementCells);
-            AccountStatementStructureWriter accountStatementStructureWriter = new AccountStatementStructureWriter(statementFileId);
-            accountStatementStructureWriter.write(accountStatementStructure);
+            AccountStatementStructure accountStatementStructure = accountStatementStructureDetector.detect(statementFileId, statementCells);
+            accountStatementStructureRepository.save(accountStatementStructure);
         }
 
     }

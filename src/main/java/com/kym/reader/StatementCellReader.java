@@ -1,10 +1,9 @@
 package com.kym.reader;
 
-import com.kym.model.StatementCell;
-import org.apache.poi.hssf.usermodel.HSSFWorkbook;
-import org.apache.poi.poifs.filesystem.POIFSFileSystem;
+import com.kym.entity.StatementCell;
 import org.apache.poi.ss.usermodel.*;
 import org.apache.poi.ss.util.CellReference;
+import org.springframework.stereotype.Component;
 
 import java.io.FileInputStream;
 import java.io.IOException;
@@ -12,6 +11,7 @@ import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.List;
 
+@Component
 public class StatementCellReader {
 
     public List<StatementCell> readStatementCells(long statementFileId, String filePath) {

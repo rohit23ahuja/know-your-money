@@ -1,4 +1,4 @@
-package com.kym.model;
+package com.kym.dto;
 
 import java.math.BigDecimal;
 

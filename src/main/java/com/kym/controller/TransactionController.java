@@ -1,12 +1,9 @@
 package com.kym.controller;
 
-import com.kym.entity.CreditCardTransaction2;
-import com.kym.model.CreditCardTransaction;
-import com.kym.model.CreditCardTransactionDTO;
+import com.kym.entity.CreditCardTransaction;
+import com.kym.dto.CreditCardTransactionDTO;
 import com.kym.repository.CreditCardTransactionRepository;
-import com.kym.repository.CreditCardTransactionRepository2;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -20,7 +17,7 @@ import java.util.stream.Collectors;
 public class TransactionController {
 
     @Autowired
-    private CreditCardTransactionRepository2 creditCardTransactionRepository;
+    private CreditCardTransactionRepository creditCardTransactionRepository;
 
     @GetMapping(path = "/transactions")
     public List<CreditCardTransactionDTO> getTransactions() {
@@ -29,7 +26,7 @@ public class TransactionController {
                 .collect(Collectors.toList());
     }
 
-    public CreditCardTransactionDTO convertToDTO(CreditCardTransaction2 creditCardTransaction) {
+    public CreditCardTransactionDTO convertToDTO(CreditCardTransaction creditCardTransaction) {
         return new CreditCardTransactionDTO(
                 creditCardTransaction.getId(),
                 creditCardTransaction.getStatementFileId(),

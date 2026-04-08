@@ -1,9 +1,10 @@
 package com.kym.controller;
 
-import com.kym.model.StatementCell;
-import com.kym.model.StatementFile;
-import com.kym.writer.StatementCellWriter;
-import com.kym.writer.StatementFileWriter;
+import com.kym.api.ProcessStatementRequest;
+import com.kym.entity.StatementCell;
+import com.kym.entity.StatementFile;
+import com.kym.repository.StatementCellRepository;
+import com.kym.repository.StatementFileRepository;
 import org.apache.poi.ss.usermodel.*;
 import org.apache.poi.ss.util.CellReference;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -20,27 +21,28 @@ import java.util.List;
 @RestController
 public class StatementProcessingController {
 
-    private final StatementFileWriter statementFileWriter;
-    private final StatementCellWriter statementCellWriter;
+    private final StatementFileRepository statementFileRepository;
+    private final StatementCellRepository statementCellRepository;
 
     @Autowired
-    public StatementProcessingController(StatementFileWriter statementFileWriter,
-                                         StatementCellWriter statementCellWriter) {
-        this.statementFileWriter = statementFileWriter;
-        this.statementCellWriter = statementCellWriter;
+    public StatementProcessingController(StatementFileRepository statementFileRepository,
+                                         StatementCellRepository statementCellRepository) {
+        this.statementFileRepository = statementFileRepository;
+        this.statementCellRepository = statementCellRepository;
     }
 
     @PostMapping(path = "/statement/process")
-    public String processStatement(@RequestParam("uploadedFile") MultipartFile uploadedFile,
-                                   @RequestParam("accountName") String accountName,
-                                   @RequestParam("accountNumber") String accountNumber,
-                                   @RequestParam("statementType") String statementType,
-                                   @RequestParam("bankCode") String bankCode) {
-        StatementFile statementFile = new StatementFile(accountName, accountNumber, statementType, bankCode, uploadedFile.getName());
-        long statementFileId = statementFileWriter.writeStatementFile(statementFile);
-        List<StatementCell> statementCells = readStatementCells(statementFileId, uploadedFile);
-        int[] updateCount = statementCellWriter.writeStatementCells(statementFileId, statementCells);
-        return "Rows inserted in database: " + updateCount.length;
+    public String processStatement(@RequestParam("uploadedStatement") MultipartFile uploadedStatement,
+                                   @RequestParam("statementProcessRequest") ProcessStatementRequest processStatementRequest) {
+        StatementFile statementFile = new StatementFile(processStatementRequest.accountName(),
+                processStatementRequest.accountNumber(),
+                processStatementRequest.statementType(),
+                processStatementRequest.bankCode(),
+                uploadedStatement.getName());
+        StatementFile savedStatementFile = statementFileRepository.save(statementFile);
+        List<StatementCell> statementCells = readStatementCells(savedStatementFile.getId(), uploadedStatement);
+        List<StatementCell> statementCellsSaved = statementCellRepository.saveAll(statementCells);
+        return "Rows inserted in database: " + statementCellsSaved.size();
     }
 
     public List<StatementCell> readStatementCells(long statementFileId, MultipartFile uploadedFile) {

@@ -1,30 +1,32 @@
 package com.kym.service;
 
-import com.kym.model.StatementCell;
-import com.kym.model.StatementFile;
+import com.kym.entity.StatementCell;
+import com.kym.entity.StatementFile;
 import com.kym.reader.StatementCellReader;
-import com.kym.writer.StatementCellWriter;
-import com.kym.writer.StatementFileWriter;
+import com.kym.repository.StatementCellRepository;
+import com.kym.repository.StatementFileRepository;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
 
 import java.util.List;
 
+@Service
 public class StatementLoadService {
 
-    private final StatementFileWriter statementFileWriter;
-    private final StatementCellReader statementCellReader;
+    @Autowired
+    private StatementFileRepository statementFileRepository;
 
+    @Autowired
+    private StatementCellReader statementCellReader;
 
-    public StatementLoadService() {
-        this.statementFileWriter = new StatementFileWriter();
-        this.statementCellReader = new StatementCellReader();
-    }
+    @Autowired
+    private StatementCellRepository statementCellRepository;
 
     public long loadStatement(String accountName, String accountNumber, String statementType, String bankCode, String originalFileName) {
         StatementFile statementFile = new StatementFile(accountName, accountNumber, statementType, bankCode, originalFileName);
-        long statementFileId = statementFileWriter.writeStatementFile(statementFile);
-        List<StatementCell> statementCells = statementCellReader.readStatementCells(statementFileId, originalFileName);
-        StatementCellWriter statementCellWriter = new StatementCellWriter();
-        int[] updateCount = statementCellWriter.writeStatementCells(statementFileId, statementCells);
-        return  statementFileId;
+        StatementFile savedStatementFile = statementFileRepository.save(statementFile);
+        List<StatementCell> statementCells = statementCellReader.readStatementCells(savedStatementFile.getId(), originalFileName);
+        statementCellRepository.saveAll(statementCells);
+        return savedStatementFile.getId();
     }
 }

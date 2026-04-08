@@ -1,32 +1,35 @@
 package com.kym.service;
 
-import com.kym.model.CreditCardTransaction;
-import com.kym.model.CreditCardTransactionCategorization;
-import com.kym.model.StatementFile;
+import com.kym.dto.CreditCardTransactionCategorization;
+import com.kym.entity.CreditCardTransaction;
+import com.kym.entity.StatementFile;
+import com.kym.repository.CreditCardTransactionJdbcRepository;
 import com.kym.repository.CreditCardTransactionRepository;
-import com.kym.writer.StatementFileWriter;
+import com.kym.repository.StatementFileRepository;
+import org.springframework.stereotype.Service;
 
 import java.util.List;
 
+@Service
 public class TransactionCategorizationService {
-    private final long statementFileId;
-    private final StatementFileWriter statementFileWriter;
+    private final StatementFileRepository statementFileRepository;
     private final CreditCardTransactionRepository creditCardTransactionRepository;
+    private final CreditCardTransactionCategorizationService creditCardTransactionCategorizationService;
+    private final CreditCardTransactionJdbcRepository creditCardTransactionJdbcRepository;
 
-
-    public TransactionCategorizationService(long statementFileId) {
-        this.statementFileId = statementFileId;
-        statementFileWriter = new StatementFileWriter();
-        creditCardTransactionRepository = new CreditCardTransactionRepository(statementFileId);
+    public TransactionCategorizationService(StatementFileRepository statementFileRepository, CreditCardTransactionRepository creditCardTransactionRepository, CreditCardTransactionCategorizationService creditCardTransactionCategorizationService, CreditCardTransactionJdbcRepository creditCardTransactionJdbcRepository) {
+        this.statementFileRepository = statementFileRepository;
+        this.creditCardTransactionRepository = creditCardTransactionRepository;
+        this.creditCardTransactionCategorizationService = creditCardTransactionCategorizationService;
+        this.creditCardTransactionJdbcRepository = creditCardTransactionJdbcRepository;
     }
 
-    public void categorize() {
-        StatementFile statementFile = statementFileWriter.getStatementFile(statementFileId);
-        if ("credit-card-statement".equals(statementFile.statementType())) {
-            List<CreditCardTransaction> creditCardTransactions = creditCardTransactionRepository.getCreditCardTransactions();
-            CreditCardTransactionCategorizationService creditCardTransactionCategorizationService = new CreditCardTransactionCategorizationService();
+    public void categorize(long statementFileId) {
+        StatementFile statementFile = statementFileRepository.findById(statementFileId).get();
+        if ("credit-card-statement".equals(statementFile.getStatementType())) {
+            List<CreditCardTransaction> creditCardTransactions = creditCardTransactionRepository.findByStatementFileId(statementFileId);
             List<CreditCardTransactionCategorization> creditCardTransactionCategorizations = creditCardTransactionCategorizationService.categorize(creditCardTransactions);
-            creditCardTransactionRepository.update(creditCardTransactionCategorizations);
+            creditCardTransactionJdbcRepository.updateTransactionCategorization(creditCardTransactionCategorizations);
         } else {
 //TODO
         }
