@@ -19,7 +19,7 @@ public class AccountStatementStructureDetector {
         Map<Integer, List<StatementCell>> statementCellsByRowIndex = statementCells.stream().collect(Collectors.groupingBy(StatementCell::getRowIndex));
         AccountStatementStructure accountStatementStructure = statementCellsByRowIndex.entrySet().stream()
                 .filter(l -> {
-                            Map<Integer, StatementCell> cellsByColumnIndex = l.getValue().stream().collect(Collectors.toMap(StatementCell::getColumnIndex, c -> c));
+                            Map<Integer, StatementCell> cellsByColumnIndex = l.getValue().stream().collect(Collectors.toMap(StatementCell::getColIndex, c -> c));
                             return cellsByColumnIndex.size() >= 7 &&
                                     "Date".equals(cellsByColumnIndex.get(0).getRawValueText()) &&
                                     "Narration".equals(cellsByColumnIndex.get(1).getRawValueText()) &&
@@ -49,7 +49,7 @@ public class AccountStatementStructureDetector {
                 .entrySet().stream()
                 .filter(e -> e.getKey() > headerRowIndex)
                 .filter(l -> {
-                    Map<Integer, StatementCell> cellsByColumnIndex = l.getValue().stream().collect(Collectors.toMap(StatementCell::getColumnIndex, c -> c));
+                    Map<Integer, StatementCell> cellsByColumnIndex = l.getValue().stream().collect(Collectors.toMap(StatementCell::getColIndex, c -> c));
                     StatementCell dateCell = cellsByColumnIndex.get(dateColIndex);
                     return dateCell != null && isValidDate(dateCell.getRawValueText());
                 })
@@ -62,7 +62,7 @@ public class AccountStatementStructureDetector {
                 .entrySet().stream()
                 .filter(e -> e.getKey() > dataStartRowIndex)
                 .filter(l -> {
-                    Map<Integer, StatementCell> cellsByColumnIndex = l.getValue().stream().collect(Collectors.toMap(StatementCell::getColumnIndex, e -> e));
+                    Map<Integer, StatementCell> cellsByColumnIndex = l.getValue().stream().collect(Collectors.toMap(StatementCell::getColIndex, e -> e));
                     StatementCell dateCell = cellsByColumnIndex.get(dateColIndex);
                     return dateCell != null && !isValidDate(dateCell.getRawValueText());
                 })

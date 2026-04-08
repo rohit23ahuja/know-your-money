@@ -16,7 +16,7 @@ public class CreditCardStatementStructureDetector {
         Map<Integer, List<StatementCell>> statementCellsByRowIndex = statementCells.stream().collect(Collectors.groupingBy(StatementCell::getRowIndex));
         CreditCardStatementStructure creditCardStatementStructure = statementCellsByRowIndex.entrySet().stream()
                 .filter(l -> {
-                    Map<Integer, StatementCell> cellsByColumnIndex = l.getValue().stream().collect(Collectors.toMap(StatementCell::getColumnIndex, c -> c));
+                    Map<Integer, StatementCell> cellsByColumnIndex = l.getValue().stream().collect(Collectors.toMap(StatementCell::getColIndex, c -> c));
                     return cellsByColumnIndex.size() >= 25 &&
                             "Transaction type".equals(cellsByColumnIndex.get(0).getRawValueText()) &&
                             "Primary / Addon Customer Name".equals(cellsByColumnIndex.get(4).getRawValueText()) &&
@@ -44,7 +44,7 @@ public class CreditCardStatementStructureDetector {
                 .entrySet().stream()
                 .filter(e -> e.getKey() > headerRowIndex)
                 .filter(l -> {
-                    Map<Integer, StatementCell> cellsByColumnIndex = l.getValue().stream().collect(Collectors.toMap(StatementCell::getColumnIndex, c -> c));
+                    Map<Integer, StatementCell> cellsByColumnIndex = l.getValue().stream().collect(Collectors.toMap(StatementCell::getColIndex, c -> c));
                     StatementCell transactionTypeCell = cellsByColumnIndex.get(transactionTypeColIndex);
                     return transactionTypeCell != null &&
                             ("Domestic".equals(transactionTypeCell.getRawValueText()) ||
@@ -58,7 +58,7 @@ public class CreditCardStatementStructureDetector {
                 .entrySet().stream()
                 .filter(e -> e.getKey() > dataStartRowIndex)
                 .filter(l -> {
-                    Map<Integer, StatementCell> cellsByColumnIndex = l.getValue().stream().collect(Collectors.toMap(StatementCell::getColumnIndex, e -> e));
+                    Map<Integer, StatementCell> cellsByColumnIndex = l.getValue().stream().collect(Collectors.toMap(StatementCell::getColIndex, e -> e));
                     StatementCell transactionTypeCell = cellsByColumnIndex.get(transactionTypeColIndex);
                     return transactionTypeCell != null &&
                             !("Domestic".equals(transactionTypeCell.getRawValueText()) ||

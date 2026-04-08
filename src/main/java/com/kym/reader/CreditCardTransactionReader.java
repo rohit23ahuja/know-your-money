@@ -51,7 +51,7 @@ public class CreditCardTransactionReader {
                 .forEach(statementCellEntry -> {
                     Map<Integer, StatementCell> statementCellsByColIndex =
                             statementCellEntry.getValue().stream()
-                                    .collect(Collectors.toMap(StatementCell::getColumnIndex, c -> c));
+                                    .collect(Collectors.toMap(StatementCell::getColIndex, c -> c));
                     StatementCell transactionTypeCell = statementCellsByColIndex.get(creditCardStatementStructure.getTransactionTypeColIndex());
                     StatementCell customerNameCell = statementCellsByColIndex.get(creditCardStatementStructure.getCustomerNameColIndex());
 

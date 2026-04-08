@@ -1,8 +1,6 @@
 package com.kym.entity;
 
-import jakarta.persistence.Entity;
-import jakarta.persistence.Id;
-import jakarta.persistence.Table;
+import jakarta.persistence.*;
 import org.hibernate.annotations.Immutable;
 
 import java.math.BigDecimal;
@@ -13,6 +11,7 @@ import java.time.LocalDate;
 @Table(name = "account_transaction")
 public class AccountTransaction {
     @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
     private long statementFileId;
     private LocalDate txnDate;

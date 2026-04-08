@@ -1,8 +1,6 @@
 package com.kym.entity;
 
-import jakarta.persistence.Entity;
-import jakarta.persistence.Id;
-import jakarta.persistence.Table;
+import jakarta.persistence.*;
 import org.hibernate.annotations.Immutable;
 
 @Entity
@@ -10,6 +8,7 @@ import org.hibernate.annotations.Immutable;
 @Table(name = "creditcard_statement_structure")
 public class CreditCardStatementStructure {
     @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
     private long statementFileId;
     private Integer headerRowIndex;

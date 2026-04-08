@@ -1,8 +1,6 @@
 package com.kym.entity;
 
-import jakarta.persistence.Entity;
-import jakarta.persistence.Id;
-import jakarta.persistence.Table;
+import jakarta.persistence.*;
 import org.hibernate.annotations.Immutable;
 
 @Entity
@@ -11,19 +9,20 @@ import org.hibernate.annotations.Immutable;
 public class StatementFile {
 
     @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
     private String accountName;
     private String accountNumber;
     private String statementType;
     private String bankCode;
-    private String originalFileName;
+    private String originalFilename;
 
-    public StatementFile(String accountName, String accountNumber, String statementType, String bankCode, String originalFileName) {
+    public StatementFile(String accountName, String accountNumber, String statementType, String bankCode, String originalFilename) {
         this.accountName = accountName;
         this.accountNumber = accountNumber;
         this.statementType = statementType;
         this.bankCode = bankCode;
-        this.originalFileName = originalFileName;
+        this.originalFilename = originalFilename;
     }
 
     public Long getId() {
@@ -66,11 +65,7 @@ public class StatementFile {
         this.bankCode = bankCode;
     }
 
-    public String getOriginalFileName() {
-        return originalFileName;
-    }
-
-    public void setOriginalFileName(String originalFileName) {
-        this.originalFileName = originalFileName;
+    public String getOriginalFilename() {
+        return originalFilename;
     }
 }

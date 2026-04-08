@@ -16,11 +16,6 @@ public class LiquibaseConfig {
         springLiquibase.setChangeLog("classpath:db/changelog/db.changelog-master.xml");
         springLiquibase.setShouldRun(true);
 
-        System.out.println("========================================");
-        System.out.println(">>> Liquibase Configuration Created <<<");
-        System.out.println(">>> Change Log: " + springLiquibase.getChangeLog());
-        System.out.println("========================================");
-
         return springLiquibase;
     }
 }

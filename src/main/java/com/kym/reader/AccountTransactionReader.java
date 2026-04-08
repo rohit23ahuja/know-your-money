@@ -52,7 +52,7 @@ public class AccountTransactionReader {
                 .forEach(statementCellEntry -> {
                     Map<Integer, StatementCell> cellsByColumnIndex =
                             statementCellEntry.getValue().stream()
-                                    .collect(Collectors.toMap(StatementCell::getColumnIndex, c -> c));
+                                    .collect(Collectors.toMap(StatementCell::getColIndex, c -> c));
                     StatementCell dateCell = cellsByColumnIndex.get(accountStatementStructure.getDateColIndex());
                     StatementCell narrationCell = cellsByColumnIndex.get(accountStatementStructure.getNarrationColIndex());
                     StatementCell debitCell = cellsByColumnIndex.get(accountStatementStructure.getDebitColIndex());

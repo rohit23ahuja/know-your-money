@@ -10,6 +10,7 @@ import org.apache.poi.ss.util.CellReference;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.RequestPart;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -33,7 +34,7 @@ public class StatementProcessingController {
 
     @PostMapping(path = "/statement/process")
     public String processStatement(@RequestParam("uploadedStatement") MultipartFile uploadedStatement,
-                                   @RequestParam("statementProcessRequest") ProcessStatementRequest processStatementRequest) {
+                                   @RequestPart("statementProcessRequest") ProcessStatementRequest processStatementRequest) {
         StatementFile statementFile = new StatementFile(processStatementRequest.accountName(),
                 processStatementRequest.accountNumber(),
                 processStatementRequest.statementType(),

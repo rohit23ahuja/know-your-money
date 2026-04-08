@@ -15,7 +15,7 @@ public interface StatementCellRepository extends JpaRepository<StatementCell, Lo
             select c from StatementCell c
             where c.rowIndex between :dataStartRowIndex and :dataEndRowIndex
             and c.statementFileId = :statementFileId
-            order by c.rowIndex, c.columnIndex
+            order by c.rowIndex, c.colIndex
             """)
     List<StatementCell> findStatementCellsInRowRange(@Param("statementFileId") Long statementFileId,
                                                      @Param("dataStartRowIndex") Integer dataStartRowIndex,
