@@ -27,14 +27,15 @@ public class TransactionCategorizationService {
         this.creditCardTransactionJdbcRepository = creditCardTransactionJdbcRepository;
     }
 
-    public void categorize(long statementFileId) {
+    public int[] categorize(long statementFileId) {
         StatementFile statementFile = statementFileRepository.findById(statementFileId).get();
         if ("credit-card-statement".equals(statementFile.getStatementType())) {
             List<CreditCardTransaction> creditCardTransactions = creditCardTransactionRepository.findByStatementFileId(statementFileId);
             List<CreditCardTransactionCategorization> creditCardTransactionCategorizations = creditCardTransactionCategorizationService.categorize(creditCardTransactions);
-            creditCardTransactionJdbcRepository.updateTransactionCategorization(creditCardTransactionCategorizations);
+            return creditCardTransactionJdbcRepository.updateTransactionCategorization(creditCardTransactionCategorizations);
         } else {
 //TODO
         }
+        return null;
     }
 }

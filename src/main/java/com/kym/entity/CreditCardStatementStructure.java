@@ -12,36 +12,36 @@ public class CreditCardStatementStructure {
     private Long id;
     private long statementFileId;
     private Integer headerRowIndex;
-    private Integer transactionTypeColIndex;
-    private Integer customerNameColIndex;
-    private Integer dateTimeColIndex;
+    private Integer transactiontypeColIndex;
+    private Integer customernameColIndex;
+    private Integer datetimeColIndex;
     private Integer descriptionColIndex;
     private Integer rewardsColIndex;
     private Integer amtColIndex;
-    private Integer debitCreditColIndex;
+    private Integer debitcreditColIndex;
     private Integer dataStartRowIndex;
     private Integer dataEndRowIndex;
 
     public CreditCardStatementStructure(long statementFileId,
                                         Integer headerRowIndex,
-                                        Integer transactionTypeColIndex,
-                                        Integer customerNameColIndex,
+                                        Integer transactiontypeColIndex,
+                                        Integer customernameColIndex,
                                         Integer dateTimeColIndex,
                                         Integer descriptionColIndex,
                                         Integer rewardsColIndex,
                                         Integer amtColIndex,
-                                        Integer debitCreditColIndex,
+                                        Integer debitcreditColIndex,
                                         Integer dataStartRowIndex,
                                         Integer dataEndRowIndex) {
         this.statementFileId=statementFileId;
         this.headerRowIndex=headerRowIndex;
-        this.transactionTypeColIndex=transactionTypeColIndex;
-        this.customerNameColIndex=customerNameColIndex;
-        this.dateTimeColIndex=dateTimeColIndex;
+        this.transactiontypeColIndex = transactiontypeColIndex;
+        this.customernameColIndex = customernameColIndex;
+        this.datetimeColIndex =dateTimeColIndex;
         this.descriptionColIndex=descriptionColIndex;
         this.rewardsColIndex=rewardsColIndex;
         this.amtColIndex=amtColIndex;
-        this.debitCreditColIndex=debitCreditColIndex;
+        this.debitcreditColIndex = debitcreditColIndex;
         this.dataStartRowIndex=dataStartRowIndex;
         this.dataEndRowIndex=dataEndRowIndex;
     }
@@ -54,16 +54,16 @@ public class CreditCardStatementStructure {
         return headerRowIndex;
     }
 
-    public Integer getTransactionTypeColIndex() {
-        return transactionTypeColIndex;
+    public Integer getTransactiontypeColIndex() {
+        return transactiontypeColIndex;
     }
 
-    public Integer getCustomerNameColIndex() {
-        return customerNameColIndex;
+    public Integer getCustomernameColIndex() {
+        return customernameColIndex;
     }
 
-    public Integer getDateTimeColIndex() {
-        return dateTimeColIndex;
+    public Integer getDatetimeColIndex() {
+        return datetimeColIndex;
     }
 
     public Integer getDescriptionColIndex() {
@@ -78,8 +78,8 @@ public class CreditCardStatementStructure {
         return amtColIndex;
     }
 
-    public Integer getDebitCreditColIndex() {
-        return debitCreditColIndex;
+    public Integer getDebitcreditColIndex() {
+        return debitcreditColIndex;
     }
 
     public Integer getDataStartRowIndex() {
@@ -88,5 +88,8 @@ public class CreditCardStatementStructure {
 
     public Integer getDataEndRowIndex() {
         return dataEndRowIndex;
+    }
+    public Long getId() {
+        return id;
     }
 }

@@ -36,7 +36,7 @@ public class CreditCardTransactionReader {
         return new BigDecimal(text.replace(",", ""));
     }
 
-    public void readTransactions(long statementFileId) {
+    public List<CreditCardTransaction> parseAndSaveTransactions(long statementFileId) {
         CreditCardStatementStructure creditCardStatementStructure = creditCardStatementStructureRepository.findByStatementFileId(statementFileId);
         List<StatementCell> statementCells = statementCellRepository.findStatementCellsInRowRange(
                 statementFileId,
@@ -52,18 +52,18 @@ public class CreditCardTransactionReader {
                     Map<Integer, StatementCell> statementCellsByColIndex =
                             statementCellEntry.getValue().stream()
                                     .collect(Collectors.toMap(StatementCell::getColIndex, c -> c));
-                    StatementCell transactionTypeCell = statementCellsByColIndex.get(creditCardStatementStructure.getTransactionTypeColIndex());
-                    StatementCell customerNameCell = statementCellsByColIndex.get(creditCardStatementStructure.getCustomerNameColIndex());
+                    StatementCell transactionTypeCell = statementCellsByColIndex.get(creditCardStatementStructure.getTransactiontypeColIndex());
+                    StatementCell customerNameCell = statementCellsByColIndex.get(creditCardStatementStructure.getCustomernameColIndex());
 
                     DateTimeFormatter dateTimeFormatter = DateTimeFormatter.ofPattern("dd/MM/yyyy / HH:mm");
                     LocalDateTime parsedLocalDateTime = LocalDateTime.parse(statementCellsByColIndex.get(
-                                    creditCardStatementStructure.getDateTimeColIndex()).getRawValueText(),
+                                    creditCardStatementStructure.getDatetimeColIndex()).getRawValueText(),
                             dateTimeFormatter);
 
                     StatementCell descriptionCell = statementCellsByColIndex.get(creditCardStatementStructure.getDescriptionColIndex());
                     StatementCell rewardsCell = statementCellsByColIndex.get(creditCardStatementStructure.getRewardsColIndex());
                     StatementCell amtCell = statementCellsByColIndex.get(creditCardStatementStructure.getAmtColIndex());
-                    StatementCell debitCreditCell = statementCellsByColIndex.get(creditCardStatementStructure.getDebitCreditColIndex());
+                    StatementCell debitCreditCell = statementCellsByColIndex.get(creditCardStatementStructure.getDebitcreditColIndex());
 
                     creditCardTransactions.add(
                             new CreditCardTransaction(
@@ -79,7 +79,7 @@ public class CreditCardTransactionReader {
                                     debitCreditCell.getRawValueText(),
                                     statementCellEntry.getKey()));
                 });
-        creditCardTransactionRepository.saveAll(creditCardTransactions);
+        return creditCardTransactionRepository.saveAll(creditCardTransactions);
 
     }
 }

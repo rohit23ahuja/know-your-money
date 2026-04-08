@@ -4,6 +4,7 @@ import com.kym.entity.StatementCell;
 import org.apache.poi.ss.usermodel.*;
 import org.apache.poi.ss.util.CellReference;
 import org.springframework.stereotype.Component;
+import org.springframework.web.multipart.MultipartFile;
 
 import java.io.FileInputStream;
 import java.io.IOException;
@@ -14,8 +15,8 @@ import java.util.List;
 @Component
 public class StatementCellReader {
 
-    public List<StatementCell> readStatementCells(long statementFileId, String filePath) {
-        try (InputStream inputStream = new FileInputStream(filePath);
+    public List<StatementCell> readStatementCells(long statementFileId, MultipartFile uploadedFile) {
+        try (InputStream inputStream = uploadedFile.getInputStream();
              Workbook workbook = WorkbookFactory.create(inputStream)) {
             Sheet sheet = workbook.getSheetAt(0);
             DataFormatter formatter = new DataFormatter();
@@ -36,7 +37,7 @@ public class StatementCellReader {
             }
             return statementCells;
         } catch (IOException e) {
-            throw new RuntimeException("Fail to read Excel file: " +filePath, e);
+            throw new RuntimeException("Fail to read Excel file: " + uploadedFile.getOriginalFilename(), e);
         }
     }
 }

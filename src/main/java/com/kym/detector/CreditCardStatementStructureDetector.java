@@ -38,7 +38,7 @@ public class CreditCardStatementStructureDetector {
                 .findFirst()
                 .orElseThrow(() -> new RuntimeException("Unable to detect header row."));
         Integer headerRowIndex = creditCardStatementStructure.getHeaderRowIndex();
-        Integer transactionTypeColIndex = creditCardStatementStructure.getTransactionTypeColIndex();
+        Integer transactionTypeColIndex = creditCardStatementStructure.getTransactiontypeColIndex();
 
         Integer dataStartRowIndex = statementCellsByRowIndex
                 .entrySet().stream()
@@ -73,12 +73,12 @@ public class CreditCardStatementStructureDetector {
                 creditCardStatementStructure.getStatementFileId(),
                 headerRowIndex,
                 transactionTypeColIndex,
-                creditCardStatementStructure.getCustomerNameColIndex(),
-                creditCardStatementStructure.getDateTimeColIndex(),
+                creditCardStatementStructure.getCustomernameColIndex(),
+                creditCardStatementStructure.getDatetimeColIndex(),
                 creditCardStatementStructure.getDescriptionColIndex(),
                 creditCardStatementStructure.getRewardsColIndex(),
                 creditCardStatementStructure.getAmtColIndex(),
-                creditCardStatementStructure.getDebitCreditColIndex(),
+                creditCardStatementStructure.getDebitcreditColIndex(),
                 dataStartRowIndex, dataEndRowIndex);
     }
 }

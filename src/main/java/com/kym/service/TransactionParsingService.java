@@ -8,7 +8,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 @Service
-public class TransactionService {
+public class TransactionParsingService {
 
     @Autowired
     private StatementFileRepository statementFileRepository;
@@ -19,13 +19,14 @@ public class TransactionService {
     @Autowired
     private AccountTransactionReader accountTransactionReader;
 
-    public void readTransactions(long statementFileId) {
+    public Integer readTransactions(long statementFileId) {
         StatementFile statementFile = statementFileRepository.findById(statementFileId).get();
-
+        Integer parsedTransactionsCount = null;
         if("credit-card-statement".equals(statementFile.getStatementType())) {
-            creditCardTransactionReader.readTransactions(statementFileId);
+            parsedTransactionsCount = creditCardTransactionReader.parseAndSaveTransactions(statementFileId).size();
         } else {
-            accountTransactionReader.readTransactions(statementFileId);
+            parsedTransactionsCount = accountTransactionReader.parseAndSaveTransactions(statementFileId).size();
         }
+        return parsedTransactionsCount;
     }
 }

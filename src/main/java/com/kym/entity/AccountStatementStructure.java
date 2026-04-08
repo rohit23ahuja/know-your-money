@@ -75,4 +75,8 @@ public class AccountStatementStructure {
     public Integer getDataEndRowIndex() {
         return dataEndRowIndex;
     }
+
+    public Long getId() {
+        return id;
+    }
 }

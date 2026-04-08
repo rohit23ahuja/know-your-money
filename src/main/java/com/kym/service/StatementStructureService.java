@@ -39,15 +39,17 @@ public class StatementStructureService {
     }
 
 
-    public void detectStatementStructure(long statementFileId) {
+    public Long detectStatementStructure(Long statementFileId) {
         List<StatementCell> statementCells = statementCellRepository.findByStatementFileId(statementFileId);
         StatementFile statementFile = statementFileRepository.findById(statementFileId).get();
         if("credit-card-statement".equals(statementFile.getStatementType())) {
             CreditCardStatementStructure creditCardStatementStructure = creditCardStatementStructureDetector.detect(statementFileId, statementCells);
-            creditCardStatementStructureRepository.save(creditCardStatementStructure);
+            CreditCardStatementStructure savedCreditCardStatementStructure = creditCardStatementStructureRepository.save(creditCardStatementStructure);
+            return savedCreditCardStatementStructure.getId();
         } else {
             AccountStatementStructure accountStatementStructure = accountStatementStructureDetector.detect(statementFileId, statementCells);
-            accountStatementStructureRepository.save(accountStatementStructure);
+            AccountStatementStructure savedAccountStatementStructure = accountStatementStructureRepository.save(accountStatementStructure);
+            return savedAccountStatementStructure.getId();
         }
 
     }

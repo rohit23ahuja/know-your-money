@@ -37,7 +37,7 @@ public class AccountTransactionReader {
     }
 
 
-    public void readTransactions(long statementFileId) {
+    public List<AccountTransaction> parseAndSaveTransactions(long statementFileId) {
         AccountStatementStructure accountStatementStructure = accountStatementStructureRepository.findByStatementFileId(statementFileId).get();
         List<StatementCell> statementCells = statementCellRepository.findStatementCellsInRowRange(
                 statementFileId,
@@ -81,7 +81,7 @@ public class AccountTransactionReader {
                                     parseAmount(balanceCell.getRawValueText()),
                                     statementCellEntry.getKey()));
                 });
-        accountTransactionRepository.saveAll(accountTransactions);
+        return accountTransactionRepository.saveAll(accountTransactions);
     }
 
     private static BigDecimal parseAmount(String text) {
