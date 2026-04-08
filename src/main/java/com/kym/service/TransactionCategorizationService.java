@@ -17,7 +17,10 @@ public class TransactionCategorizationService {
     private final CreditCardTransactionCategorizationService creditCardTransactionCategorizationService;
     private final CreditCardTransactionJdbcRepository creditCardTransactionJdbcRepository;
 
-    public TransactionCategorizationService(StatementFileRepository statementFileRepository, CreditCardTransactionRepository creditCardTransactionRepository, CreditCardTransactionCategorizationService creditCardTransactionCategorizationService, CreditCardTransactionJdbcRepository creditCardTransactionJdbcRepository) {
+    public TransactionCategorizationService(StatementFileRepository statementFileRepository,
+                                            CreditCardTransactionRepository creditCardTransactionRepository,
+                                            CreditCardTransactionCategorizationService creditCardTransactionCategorizationService,
+                                            CreditCardTransactionJdbcRepository creditCardTransactionJdbcRepository) {
         this.statementFileRepository = statementFileRepository;
         this.creditCardTransactionRepository = creditCardTransactionRepository;
         this.creditCardTransactionCategorizationService = creditCardTransactionCategorizationService;

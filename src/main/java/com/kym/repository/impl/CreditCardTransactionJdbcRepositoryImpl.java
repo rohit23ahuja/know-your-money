@@ -1,6 +1,7 @@
-package com.kym.repository;
+package com.kym.repository.impl;
 
 import com.kym.dto.CreditCardTransactionCategorization;
+import com.kym.repository.CreditCardTransactionJdbcRepository;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Repository;
 
@@ -10,7 +11,7 @@ import java.util.List;
 public class CreditCardTransactionJdbcRepositoryImpl implements CreditCardTransactionJdbcRepository {
 
     private static final String SQL_UPDATE_CREDIT_CARD_TRANSACTION = """
-            update creditcard_transaction set transaction_categorization = ? where statement_file_id = ? and id = ?;
+            update creditcard_transaction set transaction_categorization = ? where statement_file_id = ? and id = ?
             """;
 
     private final JdbcTemplate jdbcTemplate;

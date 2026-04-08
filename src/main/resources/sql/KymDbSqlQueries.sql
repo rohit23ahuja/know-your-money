@@ -12,9 +12,6 @@ select * from statement_cell where row_index between 22 and 28;
 select id, account_name, account_number, statement_type, bank_code, original_filename from statement_file where id=39;
 select * from bank_transaction;
 
-
-
-
 select * from statement_file;
 select * from statement_cell;
 select max(row_index) from statement_cell where statement_file_id=3;
