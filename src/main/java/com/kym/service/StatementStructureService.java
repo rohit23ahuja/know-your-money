@@ -41,7 +41,7 @@ public class StatementStructureService {
 
     public Long detectStatementStructure(Long statementFileId) {
         List<StatementCell> statementCells = statementCellRepository.findByStatementFileId(statementFileId);
-        StatementFile statementFile = statementFileRepository.findById(statementFileId).get();
+        StatementFile statementFile = statementFileRepository.findById(statementFileId).orElseThrow(() -> new IllegalArgumentException("Statement file id not found:" + statementFileId));
         if("credit-card-statement".equals(statementFile.getStatementType())) {
             CreditCardStatementStructure creditCardStatementStructure = creditCardStatementStructureDetector.detect(statementFileId, statementCells);
             CreditCardStatementStructure savedCreditCardStatementStructure = creditCardStatementStructureRepository.save(creditCardStatementStructure);

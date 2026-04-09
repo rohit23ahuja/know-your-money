@@ -20,7 +20,7 @@ public class TransactionParsingService {
     private AccountTransactionReader accountTransactionReader;
 
     public Integer readTransactions(long statementFileId) {
-        StatementFile statementFile = statementFileRepository.findById(statementFileId).get();
+        StatementFile statementFile = statementFileRepository.findById(statementFileId).orElseThrow(() -> new IllegalArgumentException("Statement file id not found:" + statementFileId));
         Integer parsedTransactionsCount = null;
         if("credit-card-statement".equals(statementFile.getStatementType())) {
             parsedTransactionsCount = creditCardTransactionReader.parseAndSaveTransactions(statementFileId).size();

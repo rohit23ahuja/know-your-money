@@ -1,11 +1,11 @@
 package com.kym.reader;
 
+import com.kym.entity.AccountStatementStructure;
 import com.kym.entity.AccountTransaction;
 import com.kym.entity.StatementCell;
-import com.kym.entity.AccountStatementStructure;
+import com.kym.repository.AccountStatementStructureRepository;
 import com.kym.repository.AccountTransactionRepository;
 import com.kym.repository.StatementCellRepository;
-import com.kym.repository.AccountStatementStructureRepository;
 import org.springframework.stereotype.Component;
 
 import java.math.BigDecimal;
@@ -38,7 +38,9 @@ public class AccountTransactionReader {
 
 
     public List<AccountTransaction> parseAndSaveTransactions(long statementFileId) {
-        AccountStatementStructure accountStatementStructure = accountStatementStructureRepository.findByStatementFileId(statementFileId).get();
+        AccountStatementStructure accountStatementStructure = accountStatementStructureRepository
+                .findByStatementFileId(statementFileId)
+                .orElseThrow(() -> new IllegalArgumentException("Statement file id not found:" + statementFileId));
         List<StatementCell> statementCells = statementCellRepository.findStatementCellsInRowRange(
                 statementFileId,
                 accountStatementStructure.getDataStartRowIndex(),

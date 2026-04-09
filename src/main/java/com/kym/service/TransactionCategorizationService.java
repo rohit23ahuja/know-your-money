@@ -28,7 +28,7 @@ public class TransactionCategorizationService {
     }
 
     public int[] categorize(long statementFileId) {
-        StatementFile statementFile = statementFileRepository.findById(statementFileId).get();
+        StatementFile statementFile = statementFileRepository.findById(statementFileId).orElseThrow(() -> new IllegalArgumentException("Statement file id not found:" + statementFileId));
         if ("credit-card-statement".equals(statementFile.getStatementType())) {
             List<CreditCardTransaction> creditCardTransactions = creditCardTransactionRepository.findByStatementFileId(statementFileId);
             List<CreditCardTransactionCategorization> creditCardTransactionCategorizations = creditCardTransactionCategorizationService.categorize(creditCardTransactions);
