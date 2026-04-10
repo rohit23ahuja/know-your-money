@@ -37,7 +37,7 @@ public class SecurityConfig {
                 .authorizeHttpRequests(auth -> auth
                         .requestMatchers("/login").permitAll()
                         .requestMatchers("/error").permitAll()
-                        .requestMatchers("/", "/index.html", "/static/**", "/*.js", "/*.css").permitAll()
+                        .requestMatchers("/", "/index.html", "/static/**", "/*.js", "/*.css", "/*.svg", "/assets/**").permitAll()
                         .requestMatchers(HttpMethod.GET, "/transactions").hasAnyRole("ADMIN", "VIEWER")
                         .requestMatchers(HttpMethod.POST, "/statement/process").hasAnyRole("ADMIN")
                         .anyRequest().authenticated())

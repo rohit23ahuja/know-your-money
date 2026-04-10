@@ -178,3 +178,53 @@ buildNumber.properties
 .classpath
 .project
 .settings/
+
+# copied from vs code project
+
+# Logs
+logs
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+lerna-debug.log*
+
+# Diagnostic reports (https://nodejs.org/api/report.html)
+report.[0-9]*.[0-9]*.[0-9]*.[0-9]*.json
+
+# Dependency directories
+# Like the Maven repository, we never commit this.
+node_modules/
+
+# Build output
+# This is your "target" folder.
+dist/
+dist-ssr/
+*.local
+
+# Editor / IDE folders
+# Blocking both VS Code and IntelliJ specific settings
+.vscode/*
+!.vscode/extensions.json
+.idea/
+*.suo
+*.ntvs*
+*.njsproj
+*.sln
+*.sw?
+
+# OS metadata
+Thumbs.db
+desktop.ini
+
+# Environment variables
+# CRITICAL: This prevents leaking API URLs or keys to public GitHub
+.env
+.env.local
+.env.development.local
+.env.test.local
+.env.production.local
+
+# Vite specific
+*.posts
