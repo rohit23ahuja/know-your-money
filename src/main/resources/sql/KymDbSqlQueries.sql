@@ -4,6 +4,8 @@ truncate table statement_file cascade;
 insert into 
 statement_structure(statement_file_id, header_row_index, date_col_index, narration_col_index, debit_col_index, credit_col_index, balance_col_index, data_start_row_index, data_end_row_index) 
 values(16,1,1,1,1,1,1,1,1) returning id;
+insert into statement_file(account_name, account_number, statement_type, bank_code, original_filename)
+values('rohit-infinia', '7193', 'credit-card', 'hdfc', 'account-statement');
 
 select statement_file_id, header_row_index, date_col_index, narration_col_index, debit_col_index, credit_col_index, balance_col_index, data_start_row_index, data_end_row_index 
 from statement_structure where statement_file_id=17;
@@ -40,7 +42,7 @@ values (1, 'Domestic', 'Rohit', '10-11-2025', '14:30', 'Swiggy', -30, 300.30, nu
 select * from creditcard_transaction;
 select * from statement_file;
 
-truncate table statement_file cascade;
+
 
     id BIGSERIAL PRIMARY KEY,
     statement_file_id BIGINT not null
@@ -73,9 +75,9 @@ cct.description, cctc.transaction_categorization, cct.amt, cct.debit_credit, cct
 from creditcard_transaction cct join creditcard_transaction_categorization cctc 
 on cct.id = cctc.transaction_id order by id;
 
-select * from creditcard_transaction_categorization;
+select * from creditcard_transaction;
 
-
+drop table users;
 drop table statement_file cascade;
 drop table statement_cell cascade;
 drop table account_statement_structure cascade;
@@ -86,4 +88,11 @@ drop table creditcard_transaction cascade;
 
 update creditcard_transaction set transaction_categorization='' where statement_file_id=1 and id=1;
 
+delete from databasechangeloglock;
+delete from databasechangelog;
+truncate table statement_file cascade;
+
 select * from creditcard_transaction;
+select * from statement_cell;
+select * from creditcard_statement_structure;
+select * from kym_users;
