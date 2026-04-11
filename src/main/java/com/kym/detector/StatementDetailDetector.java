@@ -20,7 +20,7 @@ public class StatementDetailDetector {
                 .filter(statementCell -> statementCell.getRawValueText().contains("Credit Card No.:"))
                 .findFirst()
                 .orElseThrow(() -> new IllegalStateException("Account Number cell not found for statementFileId: " + statementFileId));
-        String accountNumber = accountNoStatementCell.getRawValueText().substring(accountNoStatementCell.getRawValueText().length() - 5);
+        String accountNumber = accountNoStatementCell.getRawValueText().substring(accountNoStatementCell.getRawValueText().length() - 4);
         String accountName = propertyUtils.getPropertiesMap().get(String.join(".", accountNumber, "accountname"));
         String statementType = propertyUtils.getPropertiesMap().get(String.join(".", accountNumber, "statementtype"));
         String bankCode = propertyUtils.getPropertiesMap().get(String.join(".", accountNumber, "bankcode"));

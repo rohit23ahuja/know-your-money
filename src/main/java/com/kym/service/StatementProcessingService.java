@@ -28,11 +28,8 @@ public class StatementProcessingService {
 
     public ProcessStatementResponse processStatement(MultipartFile uploadedStatement) {
         StatementLoadResponseDTO statementLoadResponseDTO = statementLoadService.loadStatement(uploadedStatement);
-
-        Long statementStructureId = statementStructureService.detectStatementStructure(statementLoadResponseDTO.statementFileId());
-
         Long statementDetailId = statementDetailService.detectStatementDetail(statementLoadResponseDTO.statementFileId());
-
+        Long statementStructureId = statementStructureService.detectStatementStructure(statementLoadResponseDTO.statementFileId());
         Integer parsedTransactionCount = transactionParsingService.readTransactions(statementLoadResponseDTO.statementFileId());
 
         int[] affectedTransactions = transactionCategorizationService.categorize(statementLoadResponseDTO.statementFileId());
