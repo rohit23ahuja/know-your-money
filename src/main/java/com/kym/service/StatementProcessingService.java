@@ -1,5 +1,6 @@
 package com.kym.service;
 
+import com.kym.api.ProcessStatementRequest;
 import com.kym.api.ProcessStatementResponse;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
@@ -28,8 +29,8 @@ public class StatementProcessingService {
         this.statementDetailService = statementDetailService;
     }
 
-    public ProcessStatementResponse processStatement(MultipartFile uploadedStatement) {
-        Long statementFileId = statementFileService.saveStatementFile(uploadedStatement);
+    public ProcessStatementResponse processStatement(MultipartFile uploadedStatement, ProcessStatementRequest processStatementRequest) {
+        Long statementFileId = statementFileService.saveStatementFile(uploadedStatement, processStatementRequest);
         Integer statementCellCount = statementCellService.readStatementCells(statementFileId, uploadedStatement);
         Long statementDetailId = statementDetailService.parseStatementDetail(statementFileId);
         Long statementStructureId = statementStructureService.parseStatementStructure(statementFileId);

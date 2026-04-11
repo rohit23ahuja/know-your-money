@@ -7,4 +7,6 @@ import org.springframework.stereotype.Repository;
 @Repository
 public interface StatementFileRepository extends JpaRepository<StatementFile, Long> {
 
+    StatementFile findByStatementMonthYearAndStatementType(String statementMonthYear, String statementType);
+
 }

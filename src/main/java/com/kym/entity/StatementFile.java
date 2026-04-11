@@ -12,20 +12,31 @@ public class StatementFile {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
     private String fileName;
+    private String statementMonthYear;
+    private String statementType;
 
-    public StatementFile(String fileName) {
+    public StatementFile() {
+
+    }
+    public StatementFile(String fileName, String statementMonthYear, String statementType) {
         this.fileName = fileName;
+        this.statementMonthYear = statementMonthYear;
+        this.statementType = statementType;
     }
 
     public Long getId() {
         return id;
     }
 
-    public void setId(Long id) {
-        this.id = id;
-    }
-
     public String getFileName() {
         return fileName;
+    }
+
+    public String getStatementMonthYear() {
+        return statementMonthYear;
+    }
+
+    public String getStatementType() {
+        return statementType;
     }
 }

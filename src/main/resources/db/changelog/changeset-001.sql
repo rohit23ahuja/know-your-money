@@ -1,6 +1,8 @@
 CREATE TABLE IF NOT EXISTS statement_file (
     id                BIGSERIAL PRIMARY KEY,
     file_name VARCHAR(255) NOT NULL,
+    statement_month_year VARCHAR(100) NOT NULL,
+    statement_type VARCHAR(100) NOT NULL,
     uploaded_at       TIMESTAMPTZ  NOT NULL DEFAULT now()
 );
 
