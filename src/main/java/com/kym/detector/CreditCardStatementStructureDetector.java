@@ -11,7 +11,6 @@ import java.util.stream.Collectors;
 @Component
 public class CreditCardStatementStructureDetector {
 
-
     public CreditCardStatementStructure detect(long statementFileId, List<StatementCell> statementCells) {
         Map<Integer, List<StatementCell>> statementCellsByRowIndex = statementCells.stream().collect(Collectors.groupingBy(StatementCell::getRowIndex));
         CreditCardStatementStructure creditCardStatementStructure = statementCellsByRowIndex.entrySet().stream()

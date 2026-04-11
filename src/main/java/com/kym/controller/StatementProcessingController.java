@@ -15,17 +15,14 @@ public class StatementProcessingController {
 
     private final StatementProcessingService statementProcessingService;
 
-
     @Autowired
     public StatementProcessingController(StatementProcessingService statementProcessingService) {
         this.statementProcessingService = statementProcessingService;
     }
 
     @PostMapping(path = "/statement/process")
-    public ProcessStatementResponse processStatement(@RequestParam("uploadedStatement") MultipartFile uploadedStatement,
-                                                     @RequestPart("statementProcessRequest") ProcessStatementRequest processStatementRequest) {
-        return statementProcessingService.processStatement(uploadedStatement, processStatementRequest);
+    public ProcessStatementResponse processStatement(@RequestParam("uploadedStatement") MultipartFile uploadedStatement) {
+        return statementProcessingService.processStatement(uploadedStatement);
     }
-
 
 }

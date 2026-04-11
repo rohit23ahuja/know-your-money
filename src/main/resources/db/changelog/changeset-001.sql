@@ -1,10 +1,6 @@
 CREATE TABLE IF NOT EXISTS statement_file (
     id                BIGSERIAL PRIMARY KEY,
-    account_name      VARCHAR(100)  NOT NULL,
-    account_number    VARCHAR(64)  NOT NULL,
-    statement_type    VARCHAR(100)  NOT NULL,
-    bank_code         VARCHAR(20)  NOT NULL,
-    original_filename VARCHAR(255) NOT NULL,
+    file_name VARCHAR(255) NOT NULL,
     uploaded_at       TIMESTAMPTZ  NOT NULL DEFAULT now()
 );
 
@@ -17,6 +13,16 @@ CREATE TABLE IF NOT EXISTS statement_cell(
     cell_ref          VARCHAR(10)  NOT NULL,
     raw_value_text    TEXT NULL,
     created_at        TIMESTAMPTZ  NOT NULL DEFAULT now()
+);
+
+CREATE TABLE IF NOT EXISTS statement_details (
+    id                BIGSERIAL PRIMARY KEY,
+    statement_file_id BIGINT       NOT NULL
+        REFERENCES statement_file (id) ON DELETE CASCADE,
+    account_name      VARCHAR(100)  NOT NULL,
+    account_number    VARCHAR(64)  NOT NULL,
+    statement_type    VARCHAR(100)  NOT NULL,
+    bank_code         VARCHAR(20)  NOT NULL
 );
 
 CREATE TABLE IF NOT EXISTS account_statement_structure (

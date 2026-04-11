@@ -77,9 +77,10 @@ on cct.id = cctc.transaction_id order by id;
 
 select * from creditcard_transaction;
 
-drop table users;
+drop table kym_users;
 drop table statement_file cascade;
 drop table statement_cell cascade;
+drop table statement_details cascade;
 drop table account_statement_structure cascade;
 drop table creditcard_statement_structure cascade;
 drop table account_transaction cascade;
