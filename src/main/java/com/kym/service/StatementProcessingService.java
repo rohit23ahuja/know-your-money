@@ -1,25 +1,27 @@
 package com.kym.service;
 
 import com.kym.api.ProcessStatementResponse;
-import com.kym.dto.StatementLoadResponseDTO;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
 @Service
 public class StatementProcessingService {
-    private final StatementLoadService statementLoadService;
+    private final StatementFileService statementFileService;
+    private final StatementCellService statementCellService;
     private final StatementStructureService statementStructureService;
     private final TransactionParsingService transactionParsingService;
     private final TransactionCategorizationService transactionCategorizationService;
     private final StatementDetailService statementDetailService;
 
 
-    public StatementProcessingService(StatementLoadService statementLoadService,
+    public StatementProcessingService(StatementFileService statementFileService,
+                                      StatementCellService statementCellService,
                                       StatementStructureService statementStructureService,
                                       TransactionParsingService transactionParsingService,
                                       TransactionCategorizationService transactionCategorizationService,
                                       StatementDetailService statementDetailService) {
-        this.statementLoadService = statementLoadService;
+        this.statementFileService = statementFileService;
+        this.statementCellService = statementCellService;
         this.statementStructureService = statementStructureService;
         this.transactionParsingService = transactionParsingService;
         this.transactionCategorizationService = transactionCategorizationService;
@@ -27,15 +29,15 @@ public class StatementProcessingService {
     }
 
     public ProcessStatementResponse processStatement(MultipartFile uploadedStatement) {
-        StatementLoadResponseDTO statementLoadResponseDTO = statementLoadService.loadStatement(uploadedStatement);
-        Long statementDetailId = statementDetailService.detectStatementDetail(statementLoadResponseDTO.statementFileId());
-        Long statementStructureId = statementStructureService.detectStatementStructure(statementLoadResponseDTO.statementFileId());
-        Integer parsedTransactionCount = transactionParsingService.readTransactions(statementLoadResponseDTO.statementFileId());
+        Long statementFileId = statementFileService.saveStatementFile(uploadedStatement);
+        Integer statementCellCount = statementCellService.readStatementCells(statementFileId, uploadedStatement);
+        Long statementDetailId = statementDetailService.parseStatementDetail(statementFileId);
+        Long statementStructureId = statementStructureService.parseStatementStructure(statementFileId);
+        Integer parsedTransactionCount = transactionParsingService.readTransactions(statementFileId);
+        int[] affectedTransactions = transactionCategorizationService.categorize(statementFileId);
 
-        int[] affectedTransactions = transactionCategorizationService.categorize(statementLoadResponseDTO.statementFileId());
-
-        return new ProcessStatementResponse(statementLoadResponseDTO.statementFileId(),
-                statementLoadResponseDTO.insertedRowCount(),
+        return new ProcessStatementResponse(statementFileId,
+                statementCellCount,
                 statementDetailId,
                 statementStructureId,
                 parsedTransactionCount,

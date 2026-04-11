@@ -21,7 +21,7 @@ public class StatementDetailService {
         this.statementDetailDetector = statementDetailDetector;
     }
 
-    public Long detectStatementDetail(Long statementFileId) {
+    public Long parseStatementDetail(Long statementFileId) {
         List<StatementCell> statementCells = statementCellRepository.findByStatementFileId(statementFileId);
         StatementDetail statementDetail = statementDetailDetector.detect(statementFileId, statementCells);
         StatementDetail savedStatementDetail = statementDetailRepository.save(statementDetail);

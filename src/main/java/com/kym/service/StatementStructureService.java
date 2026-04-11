@@ -33,7 +33,7 @@ public class StatementStructureService {
     }
 
 
-    public Long detectStatementStructure(Long statementFileId) {
+    public Long parseStatementStructure(Long statementFileId) {
         List<StatementCell> statementCells = statementCellRepository.findByStatementFileId(statementFileId);
         StatementDetail statementDetail = statementDetailRepository.findByStatementFileId(statementFileId);
         if("credit-card-statement".equals(statementDetail.getStatementType())) {
