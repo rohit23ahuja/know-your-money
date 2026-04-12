@@ -9,10 +9,12 @@ import com.kym.repository.CreditCardTransactionRepository;
 import com.kym.repository.StatementDetailRepository;
 import com.kym.repository.StatementFileRepository;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 
 @Service
+@Transactional
 public class TransactionCategorizationService {
     private final CreditCardTransactionRepository creditCardTransactionRepository;
     private final CreditCardTransactionCategorizationService creditCardTransactionCategorizationService;

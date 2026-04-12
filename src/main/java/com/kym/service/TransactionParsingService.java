@@ -8,8 +8,10 @@ import com.kym.repository.StatementDetailRepository;
 import com.kym.repository.StatementFileRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 @Service
+@Transactional
 public class TransactionParsingService {
 
     private final StatementDetailRepository statementDetailRepository;

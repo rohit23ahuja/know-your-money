@@ -2,8 +2,10 @@ package com.kym.controller;
 
 import com.kym.api.ProcessStatementRequest;
 import com.kym.api.ProcessStatementResponse;
+import com.kym.exception.StatementProcessingException;
 import com.kym.service.StatementProcessingService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RequestPart;
@@ -21,12 +23,13 @@ public class StatementProcessingController {
     }
 
     @PostMapping(path = "/statement/process")
-    public ProcessStatementResponse processStatement(@RequestParam("uploadedStatement") MultipartFile uploadedStatement,
-                                                     @RequestPart("processStatementRequest") ProcessStatementRequest processStatementRequest) {
+    public ResponseEntity<ProcessStatementResponse> processStatement(@RequestParam("uploadedStatement") MultipartFile uploadedStatement,
+                                                                     @RequestPart("processStatementRequest") ProcessStatementRequest processStatementRequest) {
         if (uploadedStatement.getOriginalFilename() == null
                 || uploadedStatement.getOriginalFilename().isBlank())
-            throw new RuntimeException("File name cannot be blank.");
-        return statementProcessingService.processStatement(uploadedStatement, processStatementRequest);
+            throw new StatementProcessingException("File name cannot be blank.");
+        ProcessStatementResponse processStatementResponse = statementProcessingService.processStatement(uploadedStatement, processStatementRequest);
+        return ResponseEntity.ok(processStatementResponse);
     }
 
 }

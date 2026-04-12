@@ -5,10 +5,12 @@ import com.kym.detector.CreditCardStatementStructureDetector;
 import com.kym.entity.*;
 import com.kym.repository.*;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 
 @Service
+@Transactional
 public class StatementStructureService {
 
     private final StatementCellRepository statementCellRepository;

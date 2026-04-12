@@ -2,15 +2,19 @@ package com.kym.service;
 
 import com.kym.api.ProcessStatementRequest;
 import com.kym.entity.StatementFile;
+import com.kym.exception.StatementProcessingException;
 import com.kym.repository.StatementFileRepository;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.time.YearMonth;
 import java.time.format.DateTimeFormatter;
+import java.util.List;
 
 @Service
+@Transactional
 public class StatementFileService {
     private final StatementFileRepository statementFileRepository;
 
@@ -20,16 +24,22 @@ public class StatementFileService {
 
     public Long saveStatementFile(MultipartFile uploadedStatement, ProcessStatementRequest processStatementRequest) {
         String statementMonthYear = parseStatementMonthYear(uploadedStatement.getOriginalFilename());
-        StatementFile byStatementMonthYearAndStatementType = statementFileRepository.findByStatementMonthYearAndStatementType(statementMonthYear, processStatementRequest.statementType());
-        if (byStatementMonthYearAndStatementType!=null && !processStatementRequest.reProcess()) {
+        List<StatementFile> existingStatementFiles = statementFileRepository
+                .findByStatementMonthYearAndStatementType(statementMonthYear, processStatementRequest.statementType());
+        if ((existingStatementFiles!=null && !existingStatementFiles.isEmpty())
+                && !processStatementRequest.reProcess()) {
             String format = """
                     Statement file id: %s exists for month year: %s and type: %s. Please send reProcess as true for processing again. Note - Existing transactions will be deleted in case of re-processing.
-                    """;
-            throw new RuntimeException(
+            """;
+            List<String> existingStatementFileIds = existingStatementFiles
+                    .stream()
+                    .map(statementFile -> statementFile.getId().toString())
+                    .toList();
+            throw new StatementProcessingException(
                     String.format(format,
-                            byStatementMonthYearAndStatementType.getId(),
-                            byStatementMonthYearAndStatementType.getStatementMonthYear(),
-                            byStatementMonthYearAndStatementType.getStatementType()));
+                            existingStatementFileIds.toString(),
+                            statementMonthYear,
+                            processStatementRequest.statementType()));
         }
         StatementFile statementFile = new StatementFile(uploadedStatement.getOriginalFilename(),
                 statementMonthYear,

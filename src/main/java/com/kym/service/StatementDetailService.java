@@ -6,10 +6,12 @@ import com.kym.entity.StatementDetail;
 import com.kym.repository.StatementCellRepository;
 import com.kym.repository.StatementDetailRepository;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 
 @Service
+@Transactional
 public class StatementDetailService {
     private final StatementCellRepository statementCellRepository;
     private final StatementDetailRepository statementDetailRepository;
