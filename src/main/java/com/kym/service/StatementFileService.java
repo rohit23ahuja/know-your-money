@@ -16,6 +16,10 @@ import java.util.List;
 @Service
 @Transactional
 public class StatementFileService {
+
+    private static final String EXCEPTION_MESSAGE_FORMAT = "Statement file ids: %s exists for month year: %s and type: %s. " +
+            "Please send reProcess as true for processing again. Note - Existing transactions will be deleted in case of re-processing.";
+
     private final StatementFileRepository statementFileRepository;
 
     public StatementFileService(StatementFileRepository statementFileRepository) {
@@ -26,20 +30,23 @@ public class StatementFileService {
         String statementMonthYear = parseStatementMonthYear(uploadedStatement.getOriginalFilename());
         List<StatementFile> existingStatementFiles = statementFileRepository
                 .findByStatementMonthYearAndStatementType(statementMonthYear, processStatementRequest.statementType());
-        if ((existingStatementFiles!=null && !existingStatementFiles.isEmpty())
-                && !processStatementRequest.reProcess()) {
-            String format = """
-                    Statement file id: %s exists for month year: %s and type: %s. Please send reProcess as true for processing again. Note - Existing transactions will be deleted in case of re-processing.
-            """;
-            List<String> existingStatementFileIds = existingStatementFiles
-                    .stream()
-                    .map(statementFile -> statementFile.getId().toString())
-                    .toList();
-            throw new StatementProcessingException(
-                    String.format(format,
-                            existingStatementFileIds.toString(),
-                            statementMonthYear,
-                            processStatementRequest.statementType()));
+        if (existingStatementFiles != null && !existingStatementFiles.isEmpty()) {
+            if (processStatementRequest.reProcess()) {
+                statementFileRepository.deleteAllByIdInBatch(existingStatementFiles
+                        .stream()
+                        .map(StatementFile::getId).toList());
+            } else {
+                List<String> existingStatementFileIds = existingStatementFiles
+                        .stream()
+                        .map(statementFile -> statementFile.getId().toString())
+                        .toList();
+                throw new StatementProcessingException(
+                        String.format(EXCEPTION_MESSAGE_FORMAT,
+                                existingStatementFileIds,
+                                statementMonthYear,
+                                processStatementRequest.statementType()));
+            }
+
         }
         StatementFile statementFile = new StatementFile(uploadedStatement.getOriginalFilename(),
                 statementMonthYear,
