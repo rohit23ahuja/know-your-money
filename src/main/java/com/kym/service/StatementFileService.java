@@ -46,7 +46,6 @@ public class StatementFileService {
                                 statementMonthYear,
                                 processStatementRequest.statementType()));
             }
-
         }
         StatementFile statementFile = new StatementFile(uploadedStatement.getOriginalFilename(),
                 statementMonthYear,
