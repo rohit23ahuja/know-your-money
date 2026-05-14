@@ -3,6 +3,8 @@ package com.kym.entity;
 import jakarta.persistence.*;
 import org.hibernate.annotations.Immutable;
 
+import java.time.LocalDate;
+
 @Entity
 @Immutable
 @Table(name = "statement_file")
@@ -12,15 +14,15 @@ public class StatementFile {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
     private String fileName;
-    private String statementMonthYear;
+    private LocalDate statementYearMonth;
     private String statementType;
 
     public StatementFile() {
 
     }
-    public StatementFile(String fileName, String statementMonthYear, String statementType) {
+    public StatementFile(String fileName, LocalDate statementYearMonth, String statementType) {
         this.fileName = fileName;
-        this.statementMonthYear = statementMonthYear;
+        this.statementYearMonth = statementYearMonth;
         this.statementType = statementType;
     }
 
@@ -32,8 +34,8 @@ public class StatementFile {
         return fileName;
     }
 
-    public String getStatementMonthYear() {
-        return statementMonthYear;
+    public LocalDate getStatementYearMonth() {
+        return statementYearMonth;
     }
 
     public String getStatementType() {

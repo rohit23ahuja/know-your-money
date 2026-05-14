@@ -99,3 +99,4 @@ select * from creditcard_statement_structure;
 select * from kym_users;
 select * from statement_details;
 select * from statement_file;
+select distinct customer_name from creditcard_transaction;

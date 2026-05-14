@@ -4,11 +4,11 @@ import com.kym.api.ProcessStatementRequest;
 import com.kym.entity.StatementFile;
 import com.kym.exception.StatementProcessingException;
 import com.kym.repository.StatementFileRepository;
-import org.apache.commons.lang3.StringUtils;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
+import java.time.LocalDate;
 import java.time.YearMonth;
 import java.time.format.DateTimeFormatter;
 import java.util.List;
@@ -27,9 +27,9 @@ public class StatementFileService {
     }
 
     public Long saveStatementFile(MultipartFile uploadedStatement, ProcessStatementRequest processStatementRequest) {
-        String statementMonthYear = parseStatementMonthYear(uploadedStatement.getOriginalFilename());
+        LocalDate statementYearMonth = parseStatementYearMonth(uploadedStatement.getOriginalFilename());
         List<StatementFile> existingStatementFiles = statementFileRepository
-                .findByStatementMonthYearAndStatementType(statementMonthYear, processStatementRequest.statementType());
+                .findByStatementYearMonthAndStatementType(statementYearMonth, processStatementRequest.statementType());
         if (existingStatementFiles != null && !existingStatementFiles.isEmpty()) {
             if (processStatementRequest.reProcess()) {
                 statementFileRepository.deleteAllByIdInBatch(existingStatementFiles
@@ -43,21 +43,21 @@ public class StatementFileService {
                 throw new StatementProcessingException(
                         String.format(EXCEPTION_MESSAGE_FORMAT,
                                 existingStatementFileIds,
-                                statementMonthYear,
+                                statementYearMonth,
                                 processStatementRequest.statementType()));
             }
         }
         StatementFile statementFile = new StatementFile(uploadedStatement.getOriginalFilename(),
-                statementMonthYear,
+                statementYearMonth,
                 processStatementRequest.statementType());
         StatementFile savedStatementFile = statementFileRepository.save(statementFile);
         return savedStatementFile.getId();
     }
 
-    public String parseStatementMonthYear(String fileName) {
+    public LocalDate parseStatementYearMonth(String fileName) {
         String monthYearString = fileName.substring(0, 7);
         DateTimeFormatter dateTimeFormatter = DateTimeFormatter.ofPattern("MMMyyyy");
         YearMonth parsedYearMonth = YearMonth.parse(monthYearString, dateTimeFormatter);
-        return StringUtils.join(monthYearString.substring(0, 3), " ", monthYearString.substring(3));
+        return parsedYearMonth.atDay(1);
     }
 }

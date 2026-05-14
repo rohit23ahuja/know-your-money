@@ -39,6 +39,13 @@ const Dashboard = ({ token }) => {
     t.transactionCategorization.toLowerCase().includes(searchTerm.toLowerCase())
   );
 
+  const totalAmount = filteredData.reduce((sum, txn) => {
+    const amt = txn.debitCredit === 'Cr' ? -txn.amt : txn.amt;
+    return sum + amt;
+  }, 0);
+
+  const totalRewards = filteredData.reduce((sum, txn) => sum + txn.rewards, 0);
+
   return (
     <div className="min-h-[calc(100vh-4rem)] bg-slate-50 text-slate-900">
       <div className="max-w-full mx-auto bg-white rounded-xl shadow-md border border-slate-200 overflow-hidden">
@@ -130,6 +137,14 @@ const Dashboard = ({ token }) => {
                   </tr>
                 ))}
               </tbody>
+              <tfoot className="bg-slate-100 font-semibold">
+                <tr>
+                  <td colSpan="3" className="px-4 py-3 text-sm text-slate-800">Total</td>
+                  <td className="px-4 py-3 font-bold text-slate-900">₹{totalAmount.toLocaleString('en-IN')}</td>
+                  <td className="px-4 py-3 font-bold text-slate-900">{totalRewards}</td>
+                  <td></td>
+                </tr>
+              </tfoot>
             </table>
           </div>
         )}
