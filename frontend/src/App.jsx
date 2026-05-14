@@ -7,7 +7,7 @@ import UploadStatement from './UploadStatement';
 const App = () => {
   const [token, setToken] = useState(null);
   const [loading, setLoading] = useState(true);
-  const [sidebarOpen, setSidebarOpen] = useState(true);
+  const [sidebarOpen, setSidebarOpen] = useState(false);
   const [currentPage, setCurrentPage] = useState('transactions');
 
   useEffect(() => {

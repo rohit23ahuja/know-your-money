@@ -5,11 +5,45 @@ import { parseCategories } from './utils/formatters';
 
 const Dashboard = ({ token }) => {
   const [transactions, setTransactions] = useState([]);
-  const [searchTerm, setSearchTerm] = useState("");
+  const [searchTerm, setSearchTerm] = useState('');
   const [loading, setLoading] = useState(true);
+  const [searchLoading, setSearchLoading] = useState(false);
   const [error, setError] = useState('');
+  const [statementOptions, setStatementOptions] = useState([]);
+  const [customerOptions, setCustomerOptions] = useState([]);
+  const [selectedStatements, setSelectedStatements] = useState([]);
+  const [selectedCustomers, setSelectedCustomers] = useState([]);
+  const [descriptionFilter, setDescriptionFilter] = useState('');
+  const [categoryFilter, setCategoryFilter] = useState('');
+  const [dateFrom, setDateFrom] = useState('');
+  const [dateTo, setDateTo] = useState('');
 
   useEffect(() => {
+    const fetchFilters = async () => {
+      try {
+        const [statementRes, customerRes] = await Promise.all([
+          axios.get('/statement-year-month', {
+            headers: { Authorization: `Bearer ${token}` }
+          }),
+          axios.get('/customer-name', {
+            headers: { Authorization: `Bearer ${token}` }
+          })
+        ]);
+
+        setStatementOptions(
+          statementRes.data.map((item) => ({
+            id: item.id,
+            value: item.statementYearMonth
+              ? item.statementYearMonth.toString().substring(0, 7)
+              : ''
+          }))
+        );
+        setCustomerOptions(customerRes.data || []);
+      } catch (err) {
+        console.error('Failed to load search filters:', err);
+      }
+    };
+
     const fetchTransactions = async () => {
       setLoading(true);
       setError('');
@@ -22,21 +56,72 @@ const Dashboard = ({ token }) => {
         setTransactions(response.data);
       } catch (err) {
         setError('Failed to load transactions. Please try again.');
-        console.error("API Error:", err);
+        console.error('API Error:', err);
       } finally {
         setLoading(false);
       }
     };
 
     if (token) {
+      fetchFilters();
       fetchTransactions();
     }
   }, [token]);
 
-  const filteredData = transactions.filter(t => 
-    t.description.toLowerCase().includes(searchTerm.toLowerCase()) ||
-    t.customerName.toLowerCase().includes(searchTerm.toLowerCase()) ||
-    t.transactionCategorization.toLowerCase().includes(searchTerm.toLowerCase())
+  const buildSearchParams = () => {
+    const params = {};
+
+    if (selectedStatements.length > 0) {
+      params.statementYearMonth = selectedStatements;
+    }
+    if (selectedCustomers.length > 0) {
+      params.customerName = selectedCustomers;
+    }
+    if (descriptionFilter.trim()) {
+      params.description = descriptionFilter.trim();
+    }
+    if (categoryFilter.trim()) {
+      params.category = categoryFilter.trim();
+    }
+    if (dateFrom) {
+      params.txnDateFrom = dateFrom;
+    }
+    if (dateTo) {
+      params.txnDateTo = dateTo;
+    }
+
+    return params;
+  };
+
+  const handleSearch = async () => {
+    setSearchLoading(true);
+    setError('');
+    try {
+      const response = await axios.get('/transactions/search', {
+        headers: {
+          Authorization: `Bearer ${token}`
+        },
+        params: buildSearchParams()
+      });
+      setTransactions(response.data);
+    } catch (err) {
+      setError('Failed to search transactions. Please try again.');
+      console.error('Search API Error:', err);
+    } finally {
+      setSearchLoading(false);
+    }
+  };
+
+  const handleMultiSelect = (event, setter) => {
+    const values = Array.from(event.target.selectedOptions, (option) => option.value);
+    setter(values);
+  };
+
+  const filteredData = transactions.filter(
+    (t) =>
+      t.description.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      t.customerName.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      t.transactionCategorization.toLowerCase().includes(searchTerm.toLowerCase())
   );
 
   const totalAmount = filteredData.reduce((sum, txn) => {
@@ -63,8 +148,98 @@ const Dashboard = ({ token }) => {
               type="text"
               placeholder="Search descriptions..."
               className="pl-10 pr-4 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 outline-none w-full md:w-80 bg-slate-50"
+              value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
             />
+          </div>
+        </div>
+
+        {/* Search Panel */}
+        <div className="p-6 border-b border-slate-100">
+          <div className="grid gap-4 xl:grid-cols-4 lg:grid-cols-3 md:grid-cols-2">
+            <div>
+              <label className="block text-sm font-medium text-slate-700 mb-1">Statement</label>
+              <select
+                multiple
+                value={selectedStatements}
+                onChange={(e) => handleMultiSelect(e, setSelectedStatements)}
+                className="w-full h-28 rounded-lg border border-slate-200 bg-white px-3 py-2 text-sm text-slate-700 focus:border-blue-400 focus:ring-2 focus:ring-blue-200 outline-none"
+              >
+                {statementOptions.map((option) => (
+                  <option key={option.id} value={option.value}>
+                    {option.value}
+                  </option>
+                ))}
+              </select>
+            </div>
+
+            <div>
+              <label className="block text-sm font-medium text-slate-700 mb-1">Account Holder</label>
+              <select
+                multiple
+                value={selectedCustomers}
+                onChange={(e) => handleMultiSelect(e, setSelectedCustomers)}
+                className="w-full h-28 rounded-lg border border-slate-200 bg-white px-3 py-2 text-sm text-slate-700 focus:border-blue-400 focus:ring-2 focus:ring-blue-200 outline-none"
+              >
+                {customerOptions.map((customer) => (
+                  <option key={customer} value={customer}>
+                    {customer}
+                  </option>
+                ))}
+              </select>
+            </div>
+
+            <div>
+              <label className="block text-sm font-medium text-slate-700 mb-1">Description</label>
+              <input
+                type="text"
+                value={descriptionFilter}
+                onChange={(e) => setDescriptionFilter(e.target.value)}
+                placeholder="Description"
+                className="w-full rounded-lg border border-slate-200 bg-white px-3 py-2 text-sm text-slate-700 focus:border-blue-400 focus:ring-2 focus:ring-blue-200 outline-none"
+              />
+            </div>
+
+            <div>
+              <label className="block text-sm font-medium text-slate-700 mb-1">Category</label>
+              <input
+                type="text"
+                value={categoryFilter}
+                onChange={(e) => setCategoryFilter(e.target.value)}
+                placeholder="Category"
+                className="w-full rounded-lg border border-slate-200 bg-white px-3 py-2 text-sm text-slate-700 focus:border-blue-400 focus:ring-2 focus:ring-blue-200 outline-none"
+              />
+            </div>
+
+            <div>
+              <label className="block text-sm font-medium text-slate-700 mb-1">Transaction Date From</label>
+              <input
+                type="date"
+                value={dateFrom}
+                onChange={(e) => setDateFrom(e.target.value)}
+                className="w-full rounded-lg border border-slate-200 bg-white px-3 py-2 text-sm text-slate-700 focus:border-blue-400 focus:ring-2 focus:ring-blue-200 outline-none"
+              />
+            </div>
+
+            <div>
+              <label className="block text-sm font-medium text-slate-700 mb-1">Transaction Date To</label>
+              <input
+                type="date"
+                value={dateTo}
+                onChange={(e) => setDateTo(e.target.value)}
+                className="w-full rounded-lg border border-slate-200 bg-white px-3 py-2 text-sm text-slate-700 focus:border-blue-400 focus:ring-2 focus:ring-blue-200 outline-none"
+              />
+            </div>
+
+            <div className="flex items-end">
+              <button
+                onClick={handleSearch}
+                disabled={searchLoading}
+                className="w-full rounded-lg bg-blue-600 px-4 py-3 text-white font-semibold hover:bg-blue-700 transition-colors disabled:cursor-not-allowed disabled:opacity-60"
+              >
+                {searchLoading ? 'Searching...' : 'Search'}
+              </button>
+            </div>
           </div>
         </div>
 
@@ -107,11 +282,22 @@ const Dashboard = ({ token }) => {
               </thead>
               <tbody className="divide-y divide-slate-100">
                 {filteredData.map((txn) => (
-                  <tr key={txn.id} className={`transition-colors ${txn.debitCredit === 'Cr' ? 'bg-green-50/50 hover:bg-green-100/50' : 'hover:bg-blue-50/50'}`}>
+                  <tr
+                    key={txn.id}
+                    className={`transition-colors ${
+                      txn.debitCredit === 'Cr'
+                        ? 'bg-green-50/50 hover:bg-green-100/50'
+                        : 'hover:bg-blue-50/50'
+                    }`}
+                  >
                     <td className="px-4 py-3 text-sm text-slate-500">{txn.txnDateTime}</td>
                     <td className="px-4 py-3 font-medium text-slate-800">
                       <div className="flex items-center gap-2">
-                        {txn.debitCredit === 'Cr' && <span className="px-2 py-1 bg-green-600 text-white text-[10px] font-bold rounded">CREDIT</span>}
+                        {txn.debitCredit === 'Cr' && (
+                          <span className="px-2 py-1 bg-green-600 text-white text-[10px] font-bold rounded">
+                            CREDIT
+                          </span>
+                        )}
                         {txn.description}
                       </div>
                     </td>
