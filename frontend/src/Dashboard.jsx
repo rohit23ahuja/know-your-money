@@ -1,11 +1,9 @@
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
-import { Search } from 'lucide-react';
 import { parseCategories } from './utils/formatters';
 
 const Dashboard = ({ token }) => {
   const [transactions, setTransactions] = useState([]);
-  const [searchTerm, setSearchTerm] = useState('');
   const [loading, setLoading] = useState(true);
   const [searchLoading, setSearchLoading] = useState(false);
   const [error, setError] = useState('');
@@ -18,8 +16,18 @@ const Dashboard = ({ token }) => {
   const [dateFrom, setDateFrom] = useState('');
   const [dateTo, setDateTo] = useState('');
 
+  const resetFilters = () => {
+    setSelectedStatements([]);
+    setSelectedCustomers([]);
+    setDescriptionFilter('');
+    setCategoryFilter('');
+    setDateFrom('');
+    setDateTo('');
+  };
+
   useEffect(() => {
     const fetchFilters = async () => {
+      setLoading(true);
       try {
         const [statementRes, customerRes] = await Promise.all([
           axios.get('/statement-year-month', {
@@ -41,22 +49,6 @@ const Dashboard = ({ token }) => {
         setCustomerOptions(customerRes.data || []);
       } catch (err) {
         console.error('Failed to load search filters:', err);
-      }
-    };
-
-    const fetchTransactions = async () => {
-      setLoading(true);
-      setError('');
-      try {
-        const response = await axios.get('/transactions', {
-          headers: {
-            Authorization: `Bearer ${token}`
-          }
-        });
-        setTransactions(response.data);
-      } catch (err) {
-        setError('Failed to load transactions. Please try again.');
-        console.error('API Error:', err);
       } finally {
         setLoading(false);
       }
@@ -64,7 +56,6 @@ const Dashboard = ({ token }) => {
 
     if (token) {
       fetchFilters();
-      fetchTransactions();
     }
   }, [token]);
 
@@ -113,16 +104,13 @@ const Dashboard = ({ token }) => {
   };
 
   const handleMultiSelect = (event, setter) => {
-    const values = Array.from(event.target.selectedOptions, (option) => option.value);
+    const values = Array.from(event.target.selectedOptions, (option) => option.value).filter(
+      (value) => value !== ''
+    );
     setter(values);
   };
 
-  const filteredData = transactions.filter(
-    (t) =>
-      t.description.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      t.customerName.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      t.transactionCategorization.toLowerCase().includes(searchTerm.toLowerCase())
-  );
+  const filteredData = transactions;
 
   const totalAmount = filteredData.reduce((sum, txn) => {
     const amt = txn.debitCredit === 'Cr' ? -txn.amt : txn.amt;
@@ -134,108 +122,109 @@ const Dashboard = ({ token }) => {
   return (
     <div className="min-h-[calc(100vh-4rem)] bg-slate-50 text-slate-900">
       <div className="max-w-full mx-auto bg-white rounded-xl shadow-md border border-slate-200 overflow-hidden">
-        {/* Header Section */}
-        <div className="p-6 border-b border-slate-100 flex flex-col md:flex-row md:items-center justify-between gap-4">
-          <div>
-            <h1 className="text-2xl font-bold text-slate-800 flex items-center gap-2">
-              <span>📊</span>
-              Expense Dashboard
-            </h1>
-          </div>
-          <div className="relative">
-            <Search size={18} className="absolute left-3 top-2.5 text-slate-400" />
-            <input
-              type="text"
-              placeholder="Search descriptions..."
-              className="pl-10 pr-4 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 outline-none w-full md:w-80 bg-slate-50"
-              value={searchTerm}
-              onChange={(e) => setSearchTerm(e.target.value)}
-            />
-          </div>
-        </div>
-
         {/* Search Panel */}
         <div className="p-6 border-b border-slate-100">
-          <div className="grid gap-4 xl:grid-cols-4 lg:grid-cols-3 md:grid-cols-2">
-            <div>
-              <label className="block text-sm font-medium text-slate-700 mb-1">Statement</label>
-              <select
-                multiple
-                value={selectedStatements}
-                onChange={(e) => handleMultiSelect(e, setSelectedStatements)}
-                className="w-full h-28 rounded-lg border border-slate-200 bg-white px-3 py-2 text-sm text-slate-700 focus:border-blue-400 focus:ring-2 focus:ring-blue-200 outline-none"
+          <div className="grid gap-4 xl:grid-cols-2 lg:grid-cols-1">
+            <div className="grid gap-4 md:grid-cols-2">
+              <div className="flex items-center gap-3">
+                <span className="text-sm font-medium text-slate-700 min-w-[120px]">Statement</span>
+                <select
+                  multiple
+                  size={1}
+                  value={selectedStatements.length ? selectedStatements : ['']}
+                  onChange={(e) => handleMultiSelect(e, setSelectedStatements)}
+                  className="flex-1 rounded-lg border border-slate-200 bg-white px-3 py-2 text-sm text-slate-700 focus:border-blue-400 focus:ring-2 focus:ring-blue-200 outline-none"
+                >
+                  {selectedStatements.length === 0 && (
+                    <option value="" disabled>
+                      Select
+                    </option>
+                  )}
+                  {statementOptions.map((option) => (
+                    <option key={option.id} value={option.value}>
+                      {option.value}
+                    </option>
+                  ))}
+                </select>
+              </div>
+
+              <div className="flex items-center gap-3">
+                <span className="text-sm font-medium text-slate-700 min-w-[120px]">Account Holder</span>
+                <select
+                  multiple
+                  size={1}
+                  value={selectedCustomers.length ? selectedCustomers : ['']}
+                  onChange={(e) => handleMultiSelect(e, setSelectedCustomers)}
+                  className="flex-1 rounded-lg border border-slate-200 bg-white px-3 py-2 text-sm text-slate-700 focus:border-blue-400 focus:ring-2 focus:ring-blue-200 outline-none"
+                >
+                  {selectedCustomers.length === 0 && (
+                    <option value="" disabled>
+                      Select
+                    </option>
+                  )}
+                  {customerOptions.map((customer) => (
+                    <option key={customer} value={customer}>
+                      {customer}
+                    </option>
+                  ))}
+                </select>
+              </div>
+            </div>
+
+            <div className="grid gap-4 md:grid-cols-2">
+              <div>
+                <input
+                  type="text"
+                  value={descriptionFilter}
+                  onChange={(e) => setDescriptionFilter(e.target.value)}
+                  placeholder="Search Description"
+                  className="w-full rounded-lg border border-slate-200 bg-white px-3 py-2 text-sm text-slate-500 focus:border-blue-400 focus:ring-2 focus:ring-blue-200 outline-none"
+                />
+              </div>
+              <div>
+                <input
+                  type="text"
+                  value={categoryFilter}
+                  onChange={(e) => setCategoryFilter(e.target.value)}
+                  placeholder="Search Categories"
+                  className="w-full rounded-lg border border-slate-200 bg-white px-3 py-2 text-sm text-slate-500 focus:border-blue-400 focus:ring-2 focus:ring-blue-200 outline-none"
+                />
+              </div>
+            </div>
+
+            <div className="grid gap-4 md:grid-cols-2">
+              <div className="flex items-center gap-3">
+                <span className="text-sm font-medium text-slate-700">Transaction Date From</span>
+                <input
+                  type="date"
+                  value={dateFrom}
+                  onChange={(e) => setDateFrom(e.target.value)}
+                  className="flex-1 rounded-lg border border-slate-200 bg-white px-3 py-2 text-sm text-slate-700 focus:border-blue-400 focus:ring-2 focus:ring-blue-200 outline-none"
+                />
+              </div>
+              <div className="flex items-center gap-3">
+                <span className="text-sm font-medium text-slate-700">Transaction Date To</span>
+                <input
+                  type="date"
+                  value={dateTo}
+                  onChange={(e) => setDateTo(e.target.value)}
+                  className="flex-1 rounded-lg border border-slate-200 bg-white px-3 py-2 text-sm text-slate-700 focus:border-blue-400 focus:ring-2 focus:ring-blue-200 outline-none"
+                />
+              </div>
+            </div>
+
+            <div className="flex items-end justify-end gap-3">
+              <button
+                type="button"
+                onClick={resetFilters}
+                className="inline-flex rounded-lg border border-slate-300 bg-white px-4 py-3 text-slate-700 font-semibold hover:bg-slate-50 transition-colors"
               >
-                {statementOptions.map((option) => (
-                  <option key={option.id} value={option.value}>
-                    {option.value}
-                  </option>
-                ))}
-              </select>
-            </div>
-
-            <div>
-              <label className="block text-sm font-medium text-slate-700 mb-1">Account Holder</label>
-              <select
-                multiple
-                value={selectedCustomers}
-                onChange={(e) => handleMultiSelect(e, setSelectedCustomers)}
-                className="w-full h-28 rounded-lg border border-slate-200 bg-white px-3 py-2 text-sm text-slate-700 focus:border-blue-400 focus:ring-2 focus:ring-blue-200 outline-none"
-              >
-                {customerOptions.map((customer) => (
-                  <option key={customer} value={customer}>
-                    {customer}
-                  </option>
-                ))}
-              </select>
-            </div>
-
-            <div>
-              <label className="block text-sm font-medium text-slate-700 mb-1">Description</label>
-              <input
-                type="text"
-                value={descriptionFilter}
-                onChange={(e) => setDescriptionFilter(e.target.value)}
-                placeholder="Description"
-                className="w-full rounded-lg border border-slate-200 bg-white px-3 py-2 text-sm text-slate-700 focus:border-blue-400 focus:ring-2 focus:ring-blue-200 outline-none"
-              />
-            </div>
-
-            <div>
-              <label className="block text-sm font-medium text-slate-700 mb-1">Category</label>
-              <input
-                type="text"
-                value={categoryFilter}
-                onChange={(e) => setCategoryFilter(e.target.value)}
-                placeholder="Category"
-                className="w-full rounded-lg border border-slate-200 bg-white px-3 py-2 text-sm text-slate-700 focus:border-blue-400 focus:ring-2 focus:ring-blue-200 outline-none"
-              />
-            </div>
-
-            <div>
-              <label className="block text-sm font-medium text-slate-700 mb-1">Transaction Date From</label>
-              <input
-                type="date"
-                value={dateFrom}
-                onChange={(e) => setDateFrom(e.target.value)}
-                className="w-full rounded-lg border border-slate-200 bg-white px-3 py-2 text-sm text-slate-700 focus:border-blue-400 focus:ring-2 focus:ring-blue-200 outline-none"
-              />
-            </div>
-
-            <div>
-              <label className="block text-sm font-medium text-slate-700 mb-1">Transaction Date To</label>
-              <input
-                type="date"
-                value={dateTo}
-                onChange={(e) => setDateTo(e.target.value)}
-                className="w-full rounded-lg border border-slate-200 bg-white px-3 py-2 text-sm text-slate-700 focus:border-blue-400 focus:ring-2 focus:ring-blue-200 outline-none"
-              />
-            </div>
-
-            <div className="flex items-end">
+                Reset
+              </button>
               <button
                 onClick={handleSearch}
                 disabled={searchLoading}
-                className="w-full rounded-lg bg-blue-600 px-4 py-3 text-white font-semibold hover:bg-blue-700 transition-colors disabled:cursor-not-allowed disabled:opacity-60"
+                className="inline-flex rounded-lg bg-blue-600 px-6 py-3 text-white font-semibold hover:bg-blue-700 transition-colors disabled:cursor-not-allowed disabled:opacity-60"
               >
                 {searchLoading ? 'Searching...' : 'Search'}
               </button>

@@ -35,7 +35,7 @@ const MainLayout = ({ token, onLogout, sidebarOpen, onToggleSidebar, currentPage
       <Sidebar isOpen={sidebarOpen} currentPage={currentPage} onNavigate={onNavigate} />
 
       {/* Main Content */}
-      <main className={`pt-16 transition-all duration-300 ${sidebarOpen ? 'md:ml-48' : ''}`}>
+      <main className={`pt-16 transition-all duration-300 border-l-2 border-r-2 border-slate-200 ${sidebarOpen ? 'md:ml-48' : 'ml-1'}`}>
         {children}
       </main>
     </div>
