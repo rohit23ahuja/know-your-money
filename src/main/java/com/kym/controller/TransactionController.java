@@ -1,10 +1,19 @@
 package com.kym.controller;
 
-import com.kym.entity.CreditCardTransaction;
+import com.kym.api.PageResponse;
+import com.kym.api.TransactionSearchRequest;
 import com.kym.dto.CreditCardTransactionDTO;
+import com.kym.entity.CreditCardTransaction;
 import com.kym.repository.CreditCardTransactionRepository;
+import com.kym.specification.CreditCardTransactionSpecification;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.jpa.domain.Specification;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.ModelAttribute;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import java.time.LocalDateTime;
@@ -24,6 +33,26 @@ public class TransactionController {
         return creditCardTransactionRepository.findAll().stream()
                 .map(this::convertToDTO)
                 .collect(Collectors.toList());
+    }
+
+
+    @GetMapping(path = "/transactions/search")
+    public ResponseEntity<PageResponse<CreditCardTransactionDTO>> search(
+            @ModelAttribute TransactionSearchRequest transactionSearchRequest,
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "20") int size
+    ) {
+        PageRequest pageRequest = PageRequest.of(page, size);
+        return ResponseEntity.ok(search(transactionSearchRequest, pageRequest));
+    }
+
+    public PageResponse<CreditCardTransactionDTO> search(TransactionSearchRequest transactionSearchRequest,
+                                                         PageRequest pageRequest) {
+        Specification<CreditCardTransaction> creditCardTransactionSpecification = CreditCardTransactionSpecification.withFilters(transactionSearchRequest);
+        Page<CreditCardTransactionDTO> result = creditCardTransactionRepository
+                .findAll(creditCardTransactionSpecification, pageRequest)
+                .map(this::convertToDTO);
+        return PageResponse.from(result);
     }
 
     public CreditCardTransactionDTO convertToDTO(CreditCardTransaction creditCardTransaction) {
