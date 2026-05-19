@@ -38,21 +38,14 @@ public class TransactionController {
 
     @GetMapping(path = "/transactions/search")
     public ResponseEntity<PageResponse<CreditCardTransactionDTO>> search(
-            @ModelAttribute TransactionSearchRequest transactionSearchRequest,
-            @RequestParam(defaultValue = "0") int page,
-            @RequestParam(defaultValue = "20") int size
+            @ModelAttribute TransactionSearchRequest transactionSearchRequest
     ) {
-        PageRequest pageRequest = PageRequest.of(page, size);
-        return ResponseEntity.ok(search(transactionSearchRequest, pageRequest));
-    }
-
-    public PageResponse<CreditCardTransactionDTO> search(TransactionSearchRequest transactionSearchRequest,
-                                                         PageRequest pageRequest) {
         Specification<CreditCardTransaction> creditCardTransactionSpecification = CreditCardTransactionSpecification.withFilters(transactionSearchRequest);
+        PageRequest pageRequest = PageRequest.ofSize(1000);
         Page<CreditCardTransactionDTO> result = creditCardTransactionRepository
                 .findAll(creditCardTransactionSpecification, pageRequest)
                 .map(this::convertToDTO);
-        return PageResponse.from(result);
+        return ResponseEntity.ok(PageResponse.from(result));
     }
 
     public CreditCardTransactionDTO convertToDTO(CreditCardTransaction creditCardTransaction) {

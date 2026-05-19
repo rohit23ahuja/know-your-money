@@ -9,25 +9,70 @@ const Dashboard = ({ token }) => {
   const [error, setError] = useState('');
   const [statementOptions, setStatementOptions] = useState([]);
   const [customerOptions, setCustomerOptions] = useState([]);
-  const [selectedStatements, setSelectedStatements] = useState([]);
-  const [selectedCustomers, setSelectedCustomers] = useState([]);
+  const [selectedStatementId, setSelectedStatementId] = useState('');
+  const [selectedCustomer, setSelectedCustomer] = useState('');
   const [descriptionFilter, setDescriptionFilter] = useState('');
   const [categoryFilter, setCategoryFilter] = useState('');
   const [dateFrom, setDateFrom] = useState('');
   const [dateTo, setDateTo] = useState('');
 
   const resetFilters = () => {
-    setSelectedStatements([]);
-    setSelectedCustomers([]);
+    setSelectedStatementId('');
+    setSelectedCustomer('');
     setDescriptionFilter('');
     setCategoryFilter('');
     setDateFrom('');
     setDateTo('');
   };
 
+  const toTitleCase = (value) =>
+    value
+      ? value
+          .toLowerCase()
+          .split(' ')
+          .filter((part) => part)
+          .map((part) => part.charAt(0).toUpperCase() + part.slice(1))
+          .join(' ')
+      : '';
+
+  const fetchTransactions = async ({
+    statementFileId = selectedStatementId,
+    accountHolder = selectedCustomer,
+    description = descriptionFilter,
+    category = categoryFilter,
+    transactionDateFrom = dateFrom,
+    transactionDateTo = dateTo
+  } = {}) => {
+    setSearchLoading(true);
+    setError('');
+    try {
+      const params = {};
+      if (statementFileId) params.statementFileId = statementFileId;
+      if (accountHolder) params.accountHolder = accountHolder;
+      if (description.trim()) params.description = description.trim();
+      if (category.trim()) params.category = category.trim();
+      if (transactionDateFrom) params.transactionDateFrom = transactionDateFrom;
+      if (transactionDateTo) params.transactionDateTo = transactionDateTo;
+
+      const response = await axios.get('/transactions/search', {
+        headers: {
+          Authorization: `Bearer ${token}`
+        },
+        params
+      });
+      setTransactions(response.data?.content || []);
+    } catch (err) {
+      setError('Failed to search transactions. Please try again.');
+      console.error('Search API Error:', err);
+    } finally {
+      setSearchLoading(false);
+    }
+  };
+
   useEffect(() => {
     const fetchFilters = async () => {
       setLoading(true);
+      setError('');
       try {
         const [statementRes, customerRes] = await Promise.all([
           axios.get('/statement-year-month', {
@@ -38,17 +83,32 @@ const Dashboard = ({ token }) => {
           })
         ]);
 
-        setStatementOptions(
-          statementRes.data.map((item) => ({
+        const statementItems = (statementRes.data || [])
+          .map((item) => ({
             id: item.id,
-            value: item.statementYearMonth
-              ? item.statementYearMonth.toString().substring(0, 7)
-              : ''
+            value: item.statementYearMonth ? item.statementYearMonth.toString().substring(0, 7) : ''
           }))
-        );
-        setCustomerOptions(customerRes.data || []);
+          .filter((option) => option.value)
+          .sort((a, b) => b.value.localeCompare(a.value));
+
+        const customerItems = (customerRes.data || []).map((customer) => ({
+          value: customer,
+          label: toTitleCase(customer)
+        }));
+
+        setStatementOptions(statementItems);
+        setCustomerOptions(customerItems);
+
+        const mostRecent = statementItems[0];
+        if (mostRecent) {
+          setSelectedStatementId(mostRecent.id);
+          await fetchTransactions({ statementFileId: mostRecent.id });
+        } else {
+          setTransactions([]);
+        }
       } catch (err) {
         console.error('Failed to load search filters:', err);
+        setError('Failed to load filters. Please refresh the page.');
       } finally {
         setLoading(false);
       }
@@ -62,11 +122,11 @@ const Dashboard = ({ token }) => {
   const buildSearchParams = () => {
     const params = {};
 
-    if (selectedStatements.length > 0) {
-      params.statementYearMonth = selectedStatements;
+    if (selectedStatementId) {
+      params.statementFileId = selectedStatementId;
     }
-    if (selectedCustomers.length > 0) {
-      params.customerName = selectedCustomers;
+    if (selectedCustomer) {
+      params.accountHolder = selectedCustomer;
     }
     if (descriptionFilter.trim()) {
       params.description = descriptionFilter.trim();
@@ -75,39 +135,17 @@ const Dashboard = ({ token }) => {
       params.category = categoryFilter.trim();
     }
     if (dateFrom) {
-      params.txnDateFrom = dateFrom;
+      params.transactionDateFrom = dateFrom;
     }
     if (dateTo) {
-      params.txnDateTo = dateTo;
+      params.transactionDateTo = dateTo;
     }
 
     return params;
   };
 
   const handleSearch = async () => {
-    setSearchLoading(true);
-    setError('');
-    try {
-      const response = await axios.get('/transactions/search', {
-        headers: {
-          Authorization: `Bearer ${token}`
-        },
-        params: buildSearchParams()
-      });
-      setTransactions(response.data);
-    } catch (err) {
-      setError('Failed to search transactions. Please try again.');
-      console.error('Search API Error:', err);
-    } finally {
-      setSearchLoading(false);
-    }
-  };
-
-  const handleMultiSelect = (event, setter) => {
-    const values = Array.from(event.target.selectedOptions, (option) => option.value).filter(
-      (value) => value !== ''
-    );
-    setter(values);
+    await fetchTransactions();
   };
 
   const filteredData = transactions;
@@ -129,19 +167,15 @@ const Dashboard = ({ token }) => {
               <div className="flex items-center gap-3">
                 <span className="text-sm font-medium text-slate-700 min-w-[120px]">Statement</span>
                 <select
-                  multiple
-                  size={1}
-                  value={selectedStatements.length ? selectedStatements : ['']}
-                  onChange={(e) => handleMultiSelect(e, setSelectedStatements)}
+                  value={selectedStatementId || ''}
+                  onChange={(e) => setSelectedStatementId(Number(e.target.value))}
                   className="flex-1 rounded-lg border border-slate-200 bg-white px-3 py-2 text-sm text-slate-700 focus:border-blue-400 focus:ring-2 focus:ring-blue-200 outline-none"
                 >
-                  {selectedStatements.length === 0 && (
-                    <option value="" disabled>
-                      Select
-                    </option>
-                  )}
+                  <option value="" disabled>
+                    Select
+                  </option>
                   {statementOptions.map((option) => (
-                    <option key={option.id} value={option.value}>
+                    <option key={option.id} value={option.id}>
                       {option.value}
                     </option>
                   ))}
@@ -151,20 +185,16 @@ const Dashboard = ({ token }) => {
               <div className="flex items-center gap-3">
                 <span className="text-sm font-medium text-slate-700 min-w-[120px]">Account Holder</span>
                 <select
-                  multiple
-                  size={1}
-                  value={selectedCustomers.length ? selectedCustomers : ['']}
-                  onChange={(e) => handleMultiSelect(e, setSelectedCustomers)}
+                  value={selectedCustomer || ''}
+                  onChange={(e) => setSelectedCustomer(e.target.value)}
                   className="flex-1 rounded-lg border border-slate-200 bg-white px-3 py-2 text-sm text-slate-700 focus:border-blue-400 focus:ring-2 focus:ring-blue-200 outline-none"
                 >
-                  {selectedCustomers.length === 0 && (
-                    <option value="" disabled>
-                      Select
-                    </option>
-                  )}
+                  <option value="" disabled>
+                    Select
+                  </option>
                   {customerOptions.map((customer) => (
-                    <option key={customer} value={customer}>
-                      {customer}
+                    <option key={customer.value} value={customer.value}>
+                      {customer.label}
                     </option>
                   ))}
                 </select>

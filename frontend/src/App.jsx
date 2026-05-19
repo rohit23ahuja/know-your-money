@@ -22,14 +22,14 @@ const App = () => {
   const handleLoginSuccess = (authToken) => {
     setToken(authToken);
     setCurrentPage('transactions');
-    setSidebarOpen(true);
+    setSidebarOpen(false);
   };
 
   const handleLogout = () => {
     localStorage.removeItem('authToken');
     setToken(null);
     setCurrentPage('transactions');
-    setSidebarOpen(true);
+    setSidebarOpen(false);
   };
 
   const handleNavigate = (page) => {
