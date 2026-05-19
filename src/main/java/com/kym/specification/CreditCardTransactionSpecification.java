@@ -21,7 +21,7 @@ public class CreditCardTransactionSpecification {
     private static Specification<CreditCardTransaction> hasTransactionDateBetween(LocalDate transactionDateFrom, LocalDate transactionDateTo) {
         return (root, query, criteriaBuilder) -> {
             if (transactionDateFrom != null && transactionDateTo != null)
-                return criteriaBuilder.between(root.get("txnDateTime"), transactionDateFrom, transactionDateTo);
+                return criteriaBuilder.between(root.get("txnDateTime"), transactionDateFrom   , transactionDateTo);
             return null;
         };
     }
@@ -29,14 +29,14 @@ public class CreditCardTransactionSpecification {
     private static Specification<CreditCardTransaction> hasCategory(String category) {
         return (root, query, criteriaBuilder) ->
             StringUtils.hasText(category)
-                    ? criteriaBuilder.like(root.get("transactionCategorization"), category)
+                    ? criteriaBuilder.like(criteriaBuilder.lower(root.get("transactionCategorization")), "%"+category.toLowerCase()+"%")
                     : null;
     }
 
     private static Specification<CreditCardTransaction> hasDescription(String description) {
         return (root, query, criteriaBuilder) ->
                 StringUtils.hasText(description)
-                        ? criteriaBuilder.like(root.get("description"), description)
+                        ? criteriaBuilder.like(criteriaBuilder.lower(root.get("description")), "%"+description.toLowerCase()+"%")
                         : null;
     }
 
