@@ -12,6 +12,7 @@ import java.time.LocalDate;
 import java.time.YearMonth;
 import java.time.format.DateTimeFormatter;
 import java.util.List;
+import java.util.Locale;
 
 @Service
 @Transactional
@@ -56,7 +57,7 @@ public class StatementFileService {
 
     public LocalDate parseStatementYearMonth(String fileName) {
         String monthYearString = fileName.substring(0, 7);
-        DateTimeFormatter dateTimeFormatter = DateTimeFormatter.ofPattern("MMMyyyy");
+        DateTimeFormatter dateTimeFormatter = DateTimeFormatter.ofPattern("MMMyyyy", Locale.ENGLISH);
         YearMonth parsedYearMonth = YearMonth.parse(monthYearString, dateTimeFormatter);
         return parsedYearMonth.atDay(1);
     }
