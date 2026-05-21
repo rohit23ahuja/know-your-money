@@ -9,6 +9,7 @@ import com.kym.specification.CreditCardTransactionSpecification;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Sort;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -41,7 +42,8 @@ public class TransactionController {
             @ModelAttribute TransactionSearchRequest transactionSearchRequest
     ) {
         Specification<CreditCardTransaction> creditCardTransactionSpecification = CreditCardTransactionSpecification.withFilters(transactionSearchRequest);
-        PageRequest pageRequest = PageRequest.ofSize(1000);
+        Sort sort = Sort.by("txnDateTime").descending();
+        PageRequest pageRequest = PageRequest.of(0,1000, sort);
         Page<CreditCardTransactionDTO> result = creditCardTransactionRepository
                 .findAll(creditCardTransactionSpecification, pageRequest)
                 .map(this::convertToDTO);

@@ -90,7 +90,13 @@ public class CreditCardTransactionCategorizationService {
             }
 
             if (description.contains("BHARTI AIRTEL LTD GURGAON ") ||
-                    description.contains("BHARTI AIRTEL") &&
+                    description.contains("BHARTI AIRTEL")) {
+                transactionCategorization.append("Telecom");
+                transactionCategorization.append(";");
+            }
+
+            if ((description.contains("BHARTI AIRTEL LTD GURGAON ") ||
+                    description.contains("BHARTI AIRTEL")) &&
                             (creditCardTransaction.getAmt() != null &&
                                     creditCardTransaction.getAmt().compareTo(new BigDecimal("1169")) == 1 &&
                                     creditCardTransaction.getAmt().compareTo(new BigDecimal("1181")) == -1)) {
@@ -113,6 +119,16 @@ public class CreditCardTransactionCategorizationService {
                 transactionCategorization.append(";");
             }
 
+            if (description.contains("SHIMLA")) {
+                transactionCategorization.append("Travel");
+                transactionCategorization.append(";");
+            }
+
+            if (description.contains("Chandigarh")) {
+                transactionCategorization.append("Travel");
+                transactionCategorization.append(";");
+            }
+
             if (description.contains("AMAZON PAY INDIA PRIVA www.amazon.i ") ||
                     description.contains("www.amazon.i") ||
                     description.contains("AMAZON PAY INDIA PRIVA Bangalore ") ||
@@ -120,7 +136,8 @@ public class CreditCardTransactionCategorizationService {
                     description.contains("NYKAA E RETAIL LIMI BANGALORE ") ||
                     description.contains("MYNTRA DESIGNS PRIVATE BANGALORE ") ||
                     description.contains("MYNTRA") ||
-                    description.contains("Myntra Designs Pvt Ltd BANGALORE ")) {
+                    description.contains("Myntra Designs Pvt Ltd BANGALORE ") ||
+                    description.contains("GYFTR VIA SMARTBUY NEW DELHI")) {
                 transactionCategorization.append("OnlineShopping");
                 transactionCategorization.append(";");
             }
