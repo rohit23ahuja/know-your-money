@@ -2,40 +2,47 @@ package com.kym.service;
 
 import com.kym.api.ProcessStatementRequest;
 import com.kym.api.ProcessStatementResponse;
+import com.kym.entity.*;
+import com.kym.reader.TransactionParsingService;
+import com.kym.reader.TransactionParsingServiceResolver;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
+
+import java.util.List;
 
 @Service
 public class StatementProcessingService {
     private final StatementFileService statementFileService;
     private final StatementCellService statementCellService;
-    private final StatementStructureService statementStructureService;
-    private final TransactionParsingService transactionParsingService;
     private final TransactionCategorizationService transactionCategorizationService;
     private final StatementDetailService statementDetailService;
+    private final StatementStructureServiceResolver statementStructureServiceResolver;
+    private final TransactionParsingServiceResolver transactionParsingServiceResolver;
 
 
     public StatementProcessingService(StatementFileService statementFileService,
                                       StatementCellService statementCellService,
-                                      StatementStructureService statementStructureService,
-                                      TransactionParsingService transactionParsingService,
                                       TransactionCategorizationService transactionCategorizationService,
-                                      StatementDetailService statementDetailService) {
+                                      StatementDetailService statementDetailService,
+                                      StatementStructureServiceResolver statementStructureServiceResolver,
+                                      TransactionParsingServiceResolver transactionParsingServiceResolver) {
         this.statementFileService = statementFileService;
         this.statementCellService = statementCellService;
-        this.statementStructureService = statementStructureService;
-        this.transactionParsingService = transactionParsingService;
         this.transactionCategorizationService = transactionCategorizationService;
         this.statementDetailService = statementDetailService;
+        this.statementStructureServiceResolver = statementStructureServiceResolver;
+        this.transactionParsingServiceResolver = transactionParsingServiceResolver;
     }
 
     public ProcessStatementResponse processStatement(MultipartFile uploadedStatement, ProcessStatementRequest processStatementRequest) {
-        Long statementFileId = statementFileService.saveStatementFile(uploadedStatement, processStatementRequest);
-        Integer statementCellCount = statementCellService.readStatementCells(statementFileId, uploadedStatement);
-        Long statementDetailId = statementDetailService.parseStatementDetail(statementFileId);
-        Long statementStructureId = statementStructureService.parseStatementStructure(statementFileId);
-        Integer parsedTransactionCount = transactionParsingService.readTransactions(statementFileId);
-        int[] affectedTransactions = transactionCategorizationService.categorize(statementFileId);
+        StatementFile statementFile = statementFileService.saveStatementFile(uploadedStatement, processStatementRequest);
+        List<StatementCell> statementCells = statementCellService.readStatementCells(statementFile, uploadedStatement);
+        StatementDetail statementDetail = statementDetailService.parseStatementDetail(statementFile, statementCells);
+        StatementStructureService statementStructureService = statementStructureServiceResolver.resolve(statementDetail.getStatementType());
+        StatementStructure statementStructure = statementStructureService.parseAndSaveStatementStructure(statementFile, statementCells);
+        TransactionParsingService transactionParsingService = transactionParsingServiceResolver.resolve(statementDetail.getStatementType());
+        List<? extends Transaction> transactions = transactionParsingService.parseAndSaveTransactions(statementFile.getId(), statementStructure);
+        int[] affectedTransactions = transactionCategorizationService.categorize(statementFileId, statementDetail);
 
         return new ProcessStatementResponse(statementFileId,
                 statementCellCount,

@@ -19,28 +19,28 @@ import java.util.Map;
 import java.util.stream.Collectors;
 
 @Component
-public class AccountTransactionReader {
+public class AccountTransactionReader implements TransactionParsingService<AccountTransaction, AccountStatementStructure> {
     private static final DateTimeFormatter STATEMENT_DATE_FORMAT =
             DateTimeFormatter.ofPattern("dd/MM/uu")
                     .withResolverStyle(ResolverStyle.STRICT);
 
     private final StatementCellRepository statementCellRepository;
-    private final AccountStatementStructureRepository accountStatementStructureRepository;
     private final AccountTransactionRepository accountTransactionRepository;
 
     public AccountTransactionReader(StatementCellRepository statementCellRepository,
-                                    AccountStatementStructureRepository accountStatementStructureRepository,
                                     AccountTransactionRepository accountTransactionRepository) {
         this.statementCellRepository = statementCellRepository;
-        this.accountStatementStructureRepository = accountStatementStructureRepository;
         this.accountTransactionRepository = accountTransactionRepository;
     }
 
+    @Override
+    public String getType() {
+        return "bank-account";
+    }
 
-    public List<AccountTransaction> parseAndSaveTransactions(long statementFileId) {
-        AccountStatementStructure accountStatementStructure = accountStatementStructureRepository
-                .findByStatementFileId(statementFileId)
-                .orElseThrow(() -> new IllegalArgumentException("Statement file id not found:" + statementFileId));
+    @Override
+    public List<AccountTransaction> parseAndSaveTransactions(long statementFileId,
+                                                             AccountStatementStructure accountStatementStructure) {
         List<StatementCell> statementCells = statementCellRepository.findStatementCellsInRowRange(
                 statementFileId,
                 accountStatementStructure.getDataStartRowIndex(),

@@ -9,7 +9,7 @@ import java.time.LocalDate;
 @Entity
 @Immutable
 @Table(name = "account_transaction")
-public class AccountTransaction {
+public class AccountTransaction implements Transaction {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;

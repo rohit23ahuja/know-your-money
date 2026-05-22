@@ -1,8 +1,13 @@
 package com.kym.detector;
 
-import com.kym.entity.StatementCell;
 import com.kym.entity.AccountStatementStructure;
-import org.springframework.stereotype.Component;
+import com.kym.entity.StatementCell;
+import com.kym.entity.StatementFile;
+import com.kym.entity.StatementStructure;
+import com.kym.repository.AccountStatementStructureRepository;
+import com.kym.service.StatementStructureService;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
@@ -12,10 +17,26 @@ import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 
-@Component
-public class AccountStatementStructureDetector {
+@Service
+public class AccountStatementStructureDetector implements StatementStructureService {
 
-    public AccountStatementStructure detect(long statementFileId, List<StatementCell> statementCells) {
+    private final AccountStatementStructureRepository accountStatementStructureRepository;
+
+    public AccountStatementStructureDetector(AccountStatementStructureRepository accountStatementStructureRepository) {
+        this.accountStatementStructureRepository = accountStatementStructureRepository;
+    }
+    @Override
+    @Transactional
+    public StatementStructure parseAndSaveStatementStructure(StatementFile statementFile, List<StatementCell> statementCells) {
+        return accountStatementStructureRepository.save(detect(statementFile.getId(), statementCells));
+    }
+
+    @Override
+    public String getType() {
+        return "bank-account";
+    }
+
+    private AccountStatementStructure detect(long statementFileId, List<StatementCell> statementCells) {
         Map<Integer, List<StatementCell>> statementCellsByRowIndex = statementCells.stream().collect(Collectors.groupingBy(StatementCell::getRowIndex));
         AccountStatementStructure accountStatementStructure = statementCellsByRowIndex.entrySet().stream()
                 .filter(l -> {
@@ -69,7 +90,7 @@ public class AccountStatementStructureDetector {
                 .map(Map.Entry::getKey)
                 .findFirst()
                 .orElseThrow(() -> new RuntimeException("End of transaction data not found"));
-        Integer dataEndRowIndex = dataEndIndexFound-1;
+        Integer dataEndRowIndex = dataEndIndexFound - 1;
 
         accountStatementStructure = new AccountStatementStructure(accountStatementStructure.getStatementFileId(),
                 headerRowIndex,
@@ -84,8 +105,7 @@ public class AccountStatementStructureDetector {
         return accountStatementStructure;
     }
 
-
-    public static boolean isValidDate(String dateStr) {
+    private static boolean isValidDate(String dateStr) {
         DateTimeFormatter formatter =
                 DateTimeFormatter.ofPattern("dd/MM/uu")
                         .withResolverStyle(ResolverStyle.STRICT);
@@ -96,5 +116,4 @@ public class AccountStatementStructureDetector {
             return false;  // invalid or wrong format
         }
     }
-
 }

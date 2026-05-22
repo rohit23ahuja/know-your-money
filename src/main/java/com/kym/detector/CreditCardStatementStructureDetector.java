@@ -2,16 +2,38 @@ package com.kym.detector;
 
 import com.kym.entity.CreditCardStatementStructure;
 import com.kym.entity.StatementCell;
-import org.springframework.stereotype.Component;
+import com.kym.entity.StatementFile;
+import com.kym.entity.StatementStructure;
+import com.kym.repository.CreditCardStatementStructureRepository;
+import com.kym.service.StatementStructureService;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 
-@Component
-public class CreditCardStatementStructureDetector {
+@Service
+public class CreditCardStatementStructureDetector implements StatementStructureService {
 
-    public CreditCardStatementStructure detect(long statementFileId, List<StatementCell> statementCells) {
+    private final CreditCardStatementStructureRepository creditCardStatementStructureRepository;
+
+    public CreditCardStatementStructureDetector(CreditCardStatementStructureRepository creditCardStatementStructureRepository) {
+        this.creditCardStatementStructureRepository = creditCardStatementStructureRepository;
+    }
+
+    @Override
+    @Transactional
+    public StatementStructure parseAndSaveStatementStructure(StatementFile statementFile, List<StatementCell> statementCells) {
+        return creditCardStatementStructureRepository.save(parse(statementFile.getId(), statementCells));
+    }
+
+    @Override
+    public String getType() {
+        return "credit-card";
+    }
+
+    private CreditCardStatementStructure parse(long statementFileId, List<StatementCell> statementCells) {
         Map<Integer, List<StatementCell>> statementCellsByRowIndex = statementCells.stream().collect(Collectors.groupingBy(StatementCell::getRowIndex));
         CreditCardStatementStructure creditCardStatementStructure = statementCellsByRowIndex.entrySet().stream()
                 .filter(l -> {
@@ -80,4 +102,6 @@ public class CreditCardStatementStructureDetector {
                 creditCardStatementStructure.getDebitcreditColIndex(),
                 dataStartRowIndex, dataEndRowIndex);
     }
+
+
 }

@@ -27,7 +27,7 @@ public class StatementFileService {
         this.statementFileRepository = statementFileRepository;
     }
 
-    public Long saveStatementFile(MultipartFile uploadedStatement, ProcessStatementRequest processStatementRequest) {
+    public StatementFile saveStatementFile(MultipartFile uploadedStatement, ProcessStatementRequest processStatementRequest) {
         LocalDate statementYearMonth = parseStatementYearMonth(uploadedStatement.getOriginalFilename());
         List<StatementFile> existingStatementFiles = statementFileRepository
                 .findByStatementYearMonthAndStatementType(statementYearMonth, processStatementRequest.statementType());
@@ -51,8 +51,7 @@ public class StatementFileService {
         StatementFile statementFile = new StatementFile(uploadedStatement.getOriginalFilename(),
                 statementYearMonth,
                 processStatementRequest.statementType());
-        StatementFile savedStatementFile = statementFileRepository.save(statementFile);
-        return savedStatementFile.getId();
+        return statementFileRepository.save(statementFile);
     }
 
     public LocalDate parseStatementYearMonth(String fileName) {

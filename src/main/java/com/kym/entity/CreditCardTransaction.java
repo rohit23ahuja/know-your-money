@@ -9,7 +9,7 @@ import java.time.LocalDateTime;
 @Entity
 @Immutable
 @Table(name = "creditcard_transaction")
-public class CreditCardTransaction {
+public class CreditCardTransaction implements Transaction {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)

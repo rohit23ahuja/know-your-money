@@ -6,7 +6,7 @@ import org.hibernate.annotations.Immutable;
 @Entity
 @Immutable
 @Table(name = "account_statement_structure")
-public class AccountStatementStructure {
+public class AccountStatementStructure implements StatementStructure {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
@@ -72,10 +72,12 @@ public class AccountStatementStructure {
         return dataStartRowIndex;
     }
 
+
     public Integer getDataEndRowIndex() {
         return dataEndRowIndex;
     }
 
+    @Override
     public Long getId() {
         return id;
     }

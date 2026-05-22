@@ -23,9 +23,8 @@ public class StatementCellService {
         this.statementCellRepository = statementCellRepository;
     }
 
-    public Integer readStatementCells(Long statementFileId, MultipartFile uploadedStatement) {
-        List<StatementCell> statementCells = statementCellReader.readStatementCells(statementFileId, uploadedStatement);
-        List<StatementCell> statementCellsSaved = statementCellRepository.saveAll(statementCells);
-        return statementCellsSaved.size();
+    public List<StatementCell> readStatementCells(StatementFile statementFile, MultipartFile uploadedStatement) {
+        List<StatementCell> statementCells = statementCellReader.readStatementCells(statementFile.getId(), uploadedStatement);
+        return statementCellRepository.saveAll(statementCells);
     }
 }

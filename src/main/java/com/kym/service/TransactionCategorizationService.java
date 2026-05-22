@@ -31,8 +31,7 @@ public class TransactionCategorizationService {
         this.statementDetailRepository = statementDetailRepository;
     }
 
-    public int[] categorize(long statementFileId) {
-        StatementDetail statementDetail = statementDetailRepository.findByStatementFileId(statementFileId);
+    public int[] categorize(long statementFileId, StatementDetail statementDetail) {
         if ("credit-card-statement".equals(statementDetail.getStatementType())) {
             List<CreditCardTransaction> creditCardTransactions = creditCardTransactionRepository.findByStatementFileId(statementFileId);
             List<CreditCardTransactionCategorization> creditCardTransactionCategorizations = creditCardTransactionCategorizationService.categorize(creditCardTransactions);

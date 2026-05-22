@@ -6,7 +6,7 @@ import org.hibernate.annotations.Immutable;
 @Entity
 @Immutable
 @Table(name = "creditcard_statement_structure")
-public class CreditCardStatementStructure {
+public class CreditCardStatementStructure implements StatementStructure{
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
@@ -89,6 +89,8 @@ public class CreditCardStatementStructure {
     public Integer getDataEndRowIndex() {
         return dataEndRowIndex;
     }
+
+    @Override
     public Long getId() {
         return id;
     }

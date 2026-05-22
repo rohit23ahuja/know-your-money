@@ -1,10 +1,7 @@
 package com.kym.reader;
 
-import com.kym.entity.CreditCardTransaction;
-import com.kym.entity.CreditCardStatementStructure;
-import com.kym.entity.StatementCell;
+import com.kym.entity.*;
 import com.kym.repository.CreditCardTransactionRepository;
-import com.kym.repository.CreditCardStatementStructureRepository;
 import com.kym.repository.StatementCellRepository;
 import org.springframework.stereotype.Component;
 
@@ -17,17 +14,14 @@ import java.util.Map;
 import java.util.stream.Collectors;
 
 @Component
-public class CreditCardTransactionReader {
+public class CreditCardTransactionReader implements TransactionParsingService<CreditCardTransaction, CreditCardStatementStructure> {
 
     private final StatementCellRepository statementCellRepository;
-    private final CreditCardStatementStructureRepository creditCardStatementStructureRepository;
     private final CreditCardTransactionRepository creditCardTransactionRepository;
 
     public CreditCardTransactionReader(StatementCellRepository statementCellRepository,
-                                       CreditCardStatementStructureRepository creditCardStatementStructureRepository,
                                        CreditCardTransactionRepository creditCardTransactionRepository) {
         this.statementCellRepository = statementCellRepository;
-        this.creditCardStatementStructureRepository = creditCardStatementStructureRepository;
         this.creditCardTransactionRepository = creditCardTransactionRepository;
     }
 
@@ -36,8 +30,8 @@ public class CreditCardTransactionReader {
         return new BigDecimal(text.replace(",", ""));
     }
 
-    public List<CreditCardTransaction> parseAndSaveTransactions(long statementFileId) {
-        CreditCardStatementStructure creditCardStatementStructure = creditCardStatementStructureRepository.findByStatementFileId(statementFileId);
+    @Override
+    public List<CreditCardTransaction> parseAndSaveTransactions(long statementFileId, CreditCardStatementStructure creditCardStatementStructure) {
         List<StatementCell> statementCells = statementCellRepository.findStatementCellsInRowRange(
                 statementFileId,
                 creditCardStatementStructure.getDataStartRowIndex(),
@@ -80,6 +74,11 @@ public class CreditCardTransactionReader {
                                     statementCellEntry.getKey()));
                 });
         return creditCardTransactionRepository.saveAll(creditCardTransactions);
-
     }
+
+    @Override
+    public String getType() {
+        return "credit-card";
+    }
+
 }

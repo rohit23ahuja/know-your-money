@@ -3,6 +3,7 @@ package com.kym.service;
 import com.kym.detector.StatementDetailDetector;
 import com.kym.entity.StatementCell;
 import com.kym.entity.StatementDetail;
+import com.kym.entity.StatementFile;
 import com.kym.repository.StatementCellRepository;
 import com.kym.repository.StatementDetailRepository;
 import org.springframework.stereotype.Service;
@@ -23,10 +24,8 @@ public class StatementDetailService {
         this.statementDetailDetector = statementDetailDetector;
     }
 
-    public Long parseStatementDetail(Long statementFileId) {
-        List<StatementCell> statementCells = statementCellRepository.findByStatementFileId(statementFileId);
-        StatementDetail statementDetail = statementDetailDetector.detect(statementFileId, statementCells);
-        StatementDetail savedStatementDetail = statementDetailRepository.save(statementDetail);
-        return savedStatementDetail.getId();
+    public StatementDetail parseStatementDetail(StatementFile statementFile, List<StatementCell> statementCells) {
+        StatementDetail statementDetail = statementDetailDetector.detect(statementFile.getId(), statementCells);
+        return statementDetailRepository.save(statementDetail);
     }
 }
