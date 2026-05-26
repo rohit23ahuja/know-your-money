@@ -2,6 +2,9 @@ package com.kym.service;
 
 import com.kym.dto.CreditCardTransactionCategorization;
 import com.kym.entity.CreditCardTransaction;
+import com.kym.entity.StatementDetail;
+import com.kym.entity.Transaction;
+import com.kym.repository.CreditCardTransactionJdbcRepository;
 import org.springframework.stereotype.Service;
 
 import java.math.BigDecimal;
@@ -9,9 +12,21 @@ import java.util.ArrayList;
 import java.util.List;
 
 @Service
-public class CreditCardTransactionCategorizationService {
+public class CreditCardTransactionCategorizationService implements TransactionCategorizationService<CreditCardTransaction> {
 
-    public List<CreditCardTransactionCategorization> categorize(List<CreditCardTransaction> creditCardTransactions) {
+    private final CreditCardTransactionJdbcRepository creditCardTransactionJdbcRepository;
+
+    public CreditCardTransactionCategorizationService(CreditCardTransactionJdbcRepository creditCardTransactionJdbcRepository) {
+        this.creditCardTransactionJdbcRepository = creditCardTransactionJdbcRepository;
+    }
+
+    @Override
+    public int[] categorize(List<CreditCardTransaction> creditCardTransactions, StatementDetail statementDetail) {
+        List<CreditCardTransactionCategorization> creditCardTransactionCategorizations = categorize(creditCardTransactions);
+        return creditCardTransactionJdbcRepository.updateTransactionCategorization(creditCardTransactionCategorizations);
+    }
+
+    private List<CreditCardTransactionCategorization> categorize(List<CreditCardTransaction> creditCardTransactions) {
         List<CreditCardTransactionCategorization> creditCardTransactionCategorizations = new ArrayList<>();
         for (CreditCardTransaction creditCardTransaction : creditCardTransactions) {
             StringBuilder transactionCategorization = new StringBuilder();

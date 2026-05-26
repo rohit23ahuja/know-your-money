@@ -41,14 +41,14 @@ public class StatementProcessingService {
         StatementStructureService statementStructureService = statementStructureServiceResolver.resolve(statementDetail.getStatementType());
         StatementStructure statementStructure = statementStructureService.parseAndSaveStatementStructure(statementFile, statementCells);
         TransactionParsingService transactionParsingService = transactionParsingServiceResolver.resolve(statementDetail.getStatementType());
-        List<? extends Transaction> transactions = transactionParsingService.parseAndSaveTransactions(statementFile.getId(), statementStructure);
-        int[] affectedTransactions = transactionCategorizationService.categorize(statementFileId, statementDetail);
+        List<Transaction> transactions = transactionParsingService.parseAndSaveTransactions(statementFile.getId(), statementStructure);
+        int[] affectedTransactions = transactionCategorizationService.categorize(transactions, statementDetail);
 
-        return new ProcessStatementResponse(statementFileId,
-                statementCellCount,
-                statementDetailId,
-                statementStructureId,
-                parsedTransactionCount,
+        return new ProcessStatementResponse(statementFile.getId(),
+                statementCells.size(),
+                statementDetail.getId(),
+                statementStructure.getId(),
+                transactions.size(),
                 affectedTransactions.length);
     }
 }

@@ -4,6 +4,7 @@ import com.kym.dto.CreditCardTransactionCategorization;
 import com.kym.entity.CreditCardTransaction;
 import com.kym.entity.StatementDetail;
 import com.kym.entity.StatementFile;
+import com.kym.entity.Transaction;
 import com.kym.repository.CreditCardTransactionJdbcRepository;
 import com.kym.repository.CreditCardTransactionRepository;
 import com.kym.repository.StatementDetailRepository;
@@ -13,32 +14,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 
-@Service
-@Transactional
-public class TransactionCategorizationService {
-    private final CreditCardTransactionRepository creditCardTransactionRepository;
-    private final CreditCardTransactionCategorizationService creditCardTransactionCategorizationService;
-    private final CreditCardTransactionJdbcRepository creditCardTransactionJdbcRepository;
-    private final StatementDetailRepository statementDetailRepository;
+public interface TransactionCategorizationService<T> {
 
-    public TransactionCategorizationService(CreditCardTransactionRepository creditCardTransactionRepository,
-                                            CreditCardTransactionCategorizationService creditCardTransactionCategorizationService,
-                                            CreditCardTransactionJdbcRepository creditCardTransactionJdbcRepository,
-                                            StatementDetailRepository statementDetailRepository) {
-        this.creditCardTransactionRepository = creditCardTransactionRepository;
-        this.creditCardTransactionCategorizationService = creditCardTransactionCategorizationService;
-        this.creditCardTransactionJdbcRepository = creditCardTransactionJdbcRepository;
-        this.statementDetailRepository = statementDetailRepository;
-    }
-
-    public int[] categorize(long statementFileId, StatementDetail statementDetail) {
-        if ("credit-card-statement".equals(statementDetail.getStatementType())) {
-            List<CreditCardTransaction> creditCardTransactions = creditCardTransactionRepository.findByStatementFileId(statementFileId);
-            List<CreditCardTransactionCategorization> creditCardTransactionCategorizations = creditCardTransactionCategorizationService.categorize(creditCardTransactions);
-            return creditCardTransactionJdbcRepository.updateTransactionCategorization(creditCardTransactionCategorizations);
-        } else {
-//TODO
-        }
-        return null;
-    }
+    int[] categorize(List<T> transactions, StatementDetail statementDetail);
 }
