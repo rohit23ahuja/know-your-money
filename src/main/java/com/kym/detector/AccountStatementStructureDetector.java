@@ -18,7 +18,7 @@ import java.util.Map;
 import java.util.stream.Collectors;
 
 @Service
-public class AccountStatementStructureDetector implements StatementStructureService {
+public class AccountStatementStructureDetector implements StatementStructureService<AccountStatementStructure> {
 
     private final AccountStatementStructureRepository accountStatementStructureRepository;
 
@@ -27,7 +27,7 @@ public class AccountStatementStructureDetector implements StatementStructureServ
     }
     @Override
     @Transactional
-    public StatementStructure parseAndSaveStatementStructure(StatementFile statementFile, List<StatementCell> statementCells) {
+    public AccountStatementStructure parseAndSaveStatementStructure(StatementFile statementFile, List<StatementCell> statementCells) {
         return accountStatementStructureRepository.save(detect(statementFile.getId(), statementCells));
     }
 

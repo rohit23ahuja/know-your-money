@@ -14,7 +14,7 @@ import java.util.Map;
 import java.util.stream.Collectors;
 
 @Service
-public class CreditCardStatementStructureDetector implements StatementStructureService {
+public class CreditCardStatementStructureDetector implements StatementStructureService<CreditCardStatementStructure> {
 
     private final CreditCardStatementStructureRepository creditCardStatementStructureRepository;
 
@@ -24,7 +24,7 @@ public class CreditCardStatementStructureDetector implements StatementStructureS
 
     @Override
     @Transactional
-    public StatementStructure parseAndSaveStatementStructure(StatementFile statementFile, List<StatementCell> statementCells) {
+    public CreditCardStatementStructure parseAndSaveStatementStructure(StatementFile statementFile, List<StatementCell> statementCells) {
         return creditCardStatementStructureRepository.save(parse(statementFile.getId(), statementCells));
     }
 

@@ -14,12 +14,10 @@ import java.util.List;
 @Service
 @Transactional
 public class StatementDetailService {
-    private final StatementCellRepository statementCellRepository;
     private final StatementDetailRepository statementDetailRepository;
     private final StatementDetailDetector statementDetailDetector;
 
-    public StatementDetailService(StatementCellRepository statementCellRepository, StatementDetailRepository statementDetailRepository, StatementDetailDetector statementDetailDetector) {
-        this.statementCellRepository = statementCellRepository;
+    public StatementDetailService(StatementDetailRepository statementDetailRepository, StatementDetailDetector statementDetailDetector) {
         this.statementDetailRepository = statementDetailRepository;
         this.statementDetailDetector = statementDetailDetector;
     }

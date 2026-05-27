@@ -6,9 +6,9 @@ import com.kym.entity.StatementStructure;
 
 import java.util.List;
 
-public interface StatementStructureService {
+public interface StatementStructureService<S extends StatementStructure> {
 
-    StatementStructure parseAndSaveStatementStructure(StatementFile statementFile, List<StatementCell> statementCells);
+    S parseAndSaveStatementStructure(StatementFile statementFile, List<StatementCell> statementCells);
 
     String getType();
 }
